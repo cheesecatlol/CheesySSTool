@@ -139,15 +139,6 @@ $ToolData = @(
                 </Setter.Value>
             </Setter>
         </Style>
-
-        <Style x:Key="CloseTitleBtn" TargetType="Button" BasedOn="{StaticResource TitleBtn}">
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#88CC2200"/>
-                    <Setter Property="Foreground" Value="#FF6644"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
     </Window.Resources>
 
     <Border Background="{StaticResource MainBg}" BorderBrush="#3D2E00" BorderThickness="1" CornerRadius="8">
@@ -170,14 +161,14 @@ $ToolData = @(
                         <TextBlock Text="  —  Cat &amp; Cheese Toolkit" FontSize="11" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="4,0,0,0"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <Button x:Name="MinBtn"   Style="{StaticResource TitleBtn}"      Content="—"/>
-                        <Button x:Name="CloseBtn" Style="{StaticResource CloseTitleBtn}" Content="✕"/>
+                        <Button x:Name="MinBtn"   Style="{StaticResource TitleBtn}" Content="—"/>
+                        <Button x:Name="CloseBtn" Style="{StaticResource TitleBtn}" Content="✕"/>
                     </StackPanel>
                 </Grid>
             </Border>
 
             <!-- Body -->
-            <Grid Grid.Row="1" Margin="0,0,0,0">
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="210"/>
                     <ColumnDefinition Width="*"/>
@@ -187,7 +178,6 @@ $ToolData = @(
                 <Border Grid.Column="0" Background="{StaticResource SidebarBg}" BorderBrush="#3D2E00" BorderThickness="0,0,1,0">
                     <StackPanel Margin="10,14,10,14">
 
-                        <!-- Cat ASCII -->
                         <Border Background="#0A0700" CornerRadius="6" Margin="0,0,0,14" Padding="0,10">
                             <TextBlock x:Name="CatBlock"
                                 Text="   /\_____/\  &#x0a;  /  ^   ^  \ &#x0a; (  =  w  =  )&#x0a;  \  (___) / &#x0a;  /  |   |  \ &#x0a; (__|   |__)"
@@ -199,9 +189,9 @@ $ToolData = @(
                         </Border>
 
                         <TextBlock Text="ACTIONS" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextMuted}" Margin="4,0,0,6"/>
-                        <Button x:Name="OpenFolderBtn" Content="  Open Install Folder" Style="{StaticResource SideBtn}"/>
-                        <Button x:Name="ClearCacheBtn" Content="  Clear Downloaded Files" Style="{StaticResource SideBtn}"/>
-                        <Button x:Name="OpenCmdBtn"    Content="  Open CMD" Style="{StaticResource SideBtn}"/>
+                        <Button x:Name="OpenFolderBtn" Content="  Open Install Folder"      Style="{StaticResource SideBtn}"/>
+                        <Button x:Name="ClearCacheBtn" Content="  Clear Downloaded Files"   Style="{StaticResource SideBtn}"/>
+                        <Button x:Name="OpenCmdBtn"    Content="  Open CMD"                 Style="{StaticResource SideBtn}"/>
 
                         <Separator Background="#3D2E00" Margin="0,10,0,10"/>
 
@@ -270,9 +260,6 @@ $ToolData = @(
                                                     <Trigger Property="IsSelected" Value="True">
                                                         <Setter TargetName="TabBorder" Property="Background" Value="{StaticResource Accent}"/>
                                                         <Setter Property="Foreground" Value="#0F0B00"/>
-                                                    </Trigger>
-                                                    <Trigger Property="IsSelected" Value="False">
-                                                        <Setter Property="Foreground" Value="{StaticResource TextMuted}"/>
                                                     </Trigger>
                                                     <MultiTrigger>
                                                         <MultiTrigger.Conditions>
@@ -345,15 +332,19 @@ $InstPathBlock.Text = "Install path:`n$installDir"
 function Write-Log {
     param([string]$msg)
     $time = Get-Date -Format "HH:mm:ss"
-    $LogBox.AppendText("[$time] $msg`r`n")
-    $LogBox.ScrollToEnd()
+    $LogBox.Dispatcher.Invoke([Action]{
+        $LogBox.AppendText("[$time] $msg`r`n")
+        $LogBox.ScrollToEnd()
+    })
 }
 
 function Set-Status {
     param($title, $sub, $badge = "BUSY")
-    $StatusTitle.Text = $title
-    $StatusSub.Text   = $sub
-    $StatusBadge.Text = $badge
+    $window.Dispatcher.Invoke([Action]{
+        $StatusTitle.Text = $title
+        $StatusSub.Text   = $sub
+        $StatusBadge.Text = $badge
+    })
 }
 
 function Get-GitHubAssetUrl {
@@ -375,13 +366,12 @@ function Invoke-ToolDownloadAndRun {
     $name = $tool.Name
     $cat  = $tool.Category
 
-    Set-Status "Downloading" "Fetching $name from GitHub..." "BUSY"
     Write-Log "Fetching asset info for $name..."
 
     $asset = Get-GitHubAssetUrl -ReleaseUrl $tool.URL
     if (-not $asset) {
         Write-Log "No .exe/.zip asset found for $name — opening browser."
-        Set-Status "Browser" "No asset found, opening GitHub." "IDLE"
+        Set-Status "Ready" "No asset found, opened GitHub." "IDLE"
         Start-Process $tool.URL
         return
     }
@@ -400,7 +390,8 @@ function Invoke-ToolDownloadAndRun {
             $ProgressPreference = 'Continue'
             Write-Log "Download complete: $($asset.name)"
         } catch {
-            Write-Log "Download failed: $_"
+            $err = $_
+            Write-Log "Download failed: $err"
             Set-Status "Error" "Download failed for $name." "ERR"
             Start-Process $tool.URL
             return
@@ -412,10 +403,11 @@ function Invoke-ToolDownloadAndRun {
         Expand-Archive -Path $destFile -DestinationPath $destDir -Force
         $exe = Get-ChildItem -Path $destDir -Filter "*.exe" -Recurse | Select-Object -First 1
         if ($exe) {
+            $exeName = $exe.FullName
             Write-Log "Launching $($exe.Name)"
-            Start-Process $exe.FullName
+            Start-Process $exeName
         } else {
-            Write-Log "No .exe found in zip — opening folder."
+            Write-Log "No exe found — opening folder."
             Start-Process explorer.exe $destDir
         }
     } else {
@@ -440,7 +432,6 @@ function Invoke-WebToolDownload {
         if (Test-Path $destFile) {
             Write-Log "Cached: $fileName — skipping download."
         } else {
-            Set-Status "Downloading" "Fetching $name..." "BUSY"
             Write-Log "Downloading $fileName..."
             try {
                 $ProgressPreference = 'SilentlyContinue'
@@ -448,7 +439,8 @@ function Invoke-WebToolDownload {
                 $ProgressPreference = 'Continue'
                 Write-Log "Download complete: $fileName"
             } catch {
-                Write-Log "Download failed: $_"
+                $err = $_
+                Write-Log "Download failed: $err"
                 Set-Status "Error" "Download failed." "ERR"
                 Start-Process $url
                 return
@@ -482,7 +474,7 @@ foreach ($cat in $Categories) {
     $tab.Header = $cat
 
     $scroll = New-Object System.Windows.Controls.ScrollViewer
-    $scroll.VerticalScrollBarVisibility = "Auto"
+    $scroll.VerticalScrollBarVisibility   = "Auto"
     $scroll.HorizontalScrollBarVisibility = "Disabled"
 
     $wrap = New-Object System.Windows.Controls.WrapPanel
@@ -493,14 +485,14 @@ foreach ($cat in $Categories) {
     foreach ($tool in $catTools) {
         $t = $tool
 
-        $btn = New-Object System.Windows.Controls.Button
-        $btn.Content  = $t.Name
-        $btn.Width    = 200
-        $btn.Height   = 60
-        $btn.FontSize = 12
-        $btn.Margin   = "6"
-        $btn.Cursor   = "Hand"
-        $btn.Foreground = "#F3E5F5"
+        $btn             = New-Object System.Windows.Controls.Button
+        $btn.Content     = $t.Name
+        $btn.Width       = 200
+        $btn.Height      = 60
+        $btn.FontSize    = 12
+        $btn.Margin      = "6"
+        $btn.Cursor      = "Hand"
+        $btn.Foreground  = "#F3E5F5"
 
         switch ($t.Type) {
             "Cmd"    { $btn.Background = "#0F2840" }
@@ -508,8 +500,6 @@ foreach ($cat in $Categories) {
             "Web"    { $btn.Background = "#20102D" }
         }
 
-        # Rounded button template with hover
-        $btnBg = $btn.Background
         $btn.Template = [Windows.Markup.XamlReader]::Parse("
             <ControlTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' TargetType='Button'>
                 <Border Background='{TemplateBinding Background}' CornerRadius='6' BorderBrush='#33F5C200' BorderThickness='1'>
@@ -527,10 +517,10 @@ foreach ($cat in $Categories) {
         $btn.Add_Click({
             $tName = $_.Source.Content
             $tData = $ToolData | Where-Object { $_.Name -eq $tName } | Select-Object -First 1
-            Write-Log "Clicked: $tName ($($tData.Type))"
 
             if ($tData.Type -eq "Cmd") {
                 Set-Status "Running" "Launching $tName..." "BUSY"
+                Write-Log "Starting: $tName"
                 try {
                     Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"$($tData.Command)`"" -WindowStyle Normal
                     Write-Log "Launched: $tName"
@@ -541,10 +531,32 @@ foreach ($cat in $Categories) {
                 }
             }
             elseif ($tData.Type -eq "GitHub") {
-                Invoke-ToolDownloadAndRun -tool $tData
+                $captured = $tData
+                Set-Status "Downloading" "Fetching $tName..." "BUSY"
+                Write-Log "Queuing download: $tName"
+                [System.Threading.Tasks.Task]::Run([Action]{
+                    try {
+                        Invoke-ToolDownloadAndRun -tool $captured
+                    } catch {
+                        $err = $_
+                        Write-Log "Unexpected error: $err"
+                        Set-Status "Error" "Something went wrong." "ERR"
+                    }
+                }) | Out-Null
             }
             elseif ($tData.Type -eq "Web") {
-                Invoke-WebToolDownload -tool $tData
+                $captured = $tData
+                Set-Status "Downloading" "Fetching $tName..." "BUSY"
+                Write-Log "Queuing: $tName"
+                [System.Threading.Tasks.Task]::Run([Action]{
+                    try {
+                        Invoke-WebToolDownload -tool $captured
+                    } catch {
+                        $err = $_
+                        Write-Log "Unexpected error: $err"
+                        Set-Status "Error" "Something went wrong." "ERR"
+                    }
+                }) | Out-Null
             }
         })
 
@@ -565,7 +577,7 @@ $catFrames = @(
     "   /\_____/\  `n  /  -   -  \ `n (  =  w  =  )`n  \  (___) / `n  /  |   |  \ `n (__|   |__)",
     "   /\_____/\  `n  /  ^   -  \ `n (  =  w  =  )`n  \  (___) / `n  /  |   |  \ `n (__|   |__)"
 )
-$catIdx = 0
+$script:catIdx = 0
 $catTimer = New-Object System.Windows.Threading.DispatcherTimer
 $catTimer.Interval = [TimeSpan]::FromMilliseconds(900)
 $catTimer.Add_Tick({
@@ -592,10 +604,10 @@ $ClearCacheBtn.Add_Click({
         $files = Get-ChildItem -Path $installDir -Recurse -File -ErrorAction SilentlyContinue
         $count = $files.Count
         $files | Remove-Item -Force -ErrorAction SilentlyContinue
-        Write-Log "Cleared $count file(s) from $installDir"
+        Write-Log "Cleared $count file(s) from install folder."
         Set-Status "Clean" "Removed $count downloaded file(s)." "IDLE"
     } else {
-        Write-Log "Nothing to clear — install folder doesn't exist yet."
+        Write-Log "Nothing to clear — install folder does not exist yet."
     }
 })
 
@@ -612,7 +624,7 @@ Write-Log "|  CheesySSTool  =^.^=  v2.0 (WPF)        |"
 Write-Log "|  Cat and Cheese Toolkit                  |"
 Write-Log "+------------------------------------------+"
 Write-Log "$($ToolData.Count) tools loaded across $($Categories.Count) categories."
-Write-Log "GitHub tools will auto-download and launch."
+Write-Log "GitHub/Web tools download in background — UI stays responsive."
 Write-Log "Files saved to: $installDir"
 Write-Log "Ready. Meow!"
 
