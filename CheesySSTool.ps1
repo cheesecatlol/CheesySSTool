@@ -158,7 +158,7 @@ $ToolData = @(
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="=^.^=" FontSize="14" FontWeight="Bold" Foreground="{StaticResource Accent}" FontFamily="Consolas"/>
                         <TextBlock Text="  CheesySSTool" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                        <TextBlock Text="  -  Cat &amp; Cheese Toolkit" FontSize="11" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                        <TextBlock Text="  -  By Cheese Cat" FontSize="11" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="4,0,0,0"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
                         <Button x:Name="MinBtn"   Style="{StaticResource TitleBtn}" Content="_"/>
@@ -196,7 +196,7 @@ $ToolData = @(
                         <Separator Background="#3D2E00" Margin="0,10,0,10"/>
 
                         <TextBlock Text="CREDITS" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextMuted}" Margin="4,0,0,6"/>
-                        <TextBlock Text="Made by cheese_cat0" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="4,2,0,4"/>
+                        <TextBlock Text="Made by cheese cat" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="4,2,0,4"/>
                         <TextBlock Text="Discord: cheese_cat0" FontSize="10" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap" Margin="4,1,0,0"/>
                         <TextBlock Text="GitHub: cheesecatlol" FontSize="10" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap" Margin="4,1,0,0"/>
 
@@ -666,11 +666,11 @@ $OpenFolderBtn.Add_Click({
 
 $ClearCacheBtn.Add_Click({
     if (Test-Path $installDir) {
-        $files = Get-ChildItem -Path $installDir -Recurse -File -ErrorAction SilentlyContinue
-        $count = $files.Count
-        $files | Remove-Item -Force -ErrorAction SilentlyContinue
-        Write-Log "Cleared $count file(s) from install folder."
-        Set-Status "Clean" "Removed $count downloaded file(s)." "IDLE"
+        $items = Get-ChildItem -Path $installDir -Force -ErrorAction SilentlyContinue
+        $count = @($items).Count
+        $items | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Log "Cleared $count item(s) from install folder."
+        Set-Status "Clean" "Removed downloaded files and folders." "IDLE"
     } else {
         Write-Log "Nothing to clear - install folder does not exist yet."
     }
