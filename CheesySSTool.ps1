@@ -372,6 +372,27 @@ function Start-CmdToolCommand {
     Start-Process -FilePath "cmd.exe" -ArgumentList "/k", "powershell.exe -NoProfile -ExecutionPolicy Bypass -EncodedCommand $encodedCommand" -WindowStyle Normal
 }
 
+function Save-UrlToFile {
+    param(
+        [Parameter(Mandatory=$true)][string]$Uri,
+        [Parameter(Mandatory=$true)][string]$OutFile
+    )
+
+    $tempFile = "$OutFile.download"
+    if (Test-Path -LiteralPath $tempFile) { Remove-Item -LiteralPath $tempFile -Force -ErrorAction SilentlyContinue }
+
+    $client = New-Object System.Net.WebClient
+    $client.Headers.Add("User-Agent", "CheesySSTool")
+    try {
+        $client.DownloadFile($Uri, $tempFile)
+        if (Test-Path -LiteralPath $OutFile) { Remove-Item -LiteralPath $OutFile -Force -ErrorAction Stop }
+        Move-Item -LiteralPath $tempFile -Destination $OutFile -Force -ErrorAction Stop
+    } finally {
+        $client.Dispose()
+        if (Test-Path -LiteralPath $tempFile) { Remove-Item -LiteralPath $tempFile -Force -ErrorAction SilentlyContinue }
+    }
+}
+
 function Start-DownloadedTool {
     param(
         [Parameter(Mandatory=$true)][string]$Directory,
@@ -444,9 +465,7 @@ function Invoke-ToolDownloadAndRun {
     } else {
         Write-Log "Downloading $($asset.name)..."
         try {
-            $ProgressPreference = 'SilentlyContinue'
-            Invoke-WebRequest -Uri $asset.url -OutFile $destFile -Headers @{"User-Agent"="CheesySSTool"} -UseBasicParsing -ErrorAction Stop
-            $ProgressPreference = 'Continue'
+            Save-UrlToFile -Uri $asset.url -OutFile $destFile
             Write-Log "Download complete: $($asset.name)"
         } catch {
             $err = $_
@@ -491,9 +510,7 @@ function Invoke-WebToolDownload {
         } else {
             Write-Log "Downloading $fileName..."
             try {
-                $ProgressPreference = 'SilentlyContinue'
-                Invoke-WebRequest -Uri $url -OutFile $destFile -UseBasicParsing -ErrorAction Stop
-                $ProgressPreference = 'Continue'
+                Save-UrlToFile -Uri $url -OutFile $destFile
                 Write-Log "Download complete: $fileName"
             } catch {
                 $err = $_
@@ -594,30 +611,26 @@ foreach ($cat in $Categories) {
             elseif ($tData.Type -eq "GitHub") {
                 $captured = $tData
                 Set-Status "Downloading" "Fetching $tName..." "BUSY"
-                Write-Log "Queuing download: $tName"
-                [System.Threading.Tasks.Task]::Run([Action]{
-                    try {
-                        Invoke-ToolDownloadAndRun -tool $captured
-                    } catch {
-                        $err = $_
-                        Write-Log "Unexpected error: $err"
-                        Set-Status "Error" "Something went wrong." "ERR"
-                    }
-                }) | Out-Null
+                Write-Log "Starting download: $tName"
+                try {
+                    Invoke-ToolDownloadAndRun -tool $captured
+                } catch {
+                    $err = $_
+                    Write-Log "Unexpected error: $err"
+                    Set-Status "Error" "Something went wrong." "ERR"
+                }
             }
             elseif ($tData.Type -eq "Web") {
                 $captured = $tData
                 Set-Status "Downloading" "Fetching $tName..." "BUSY"
-                Write-Log "Queuing: $tName"
-                [System.Threading.Tasks.Task]::Run([Action]{
-                    try {
-                        Invoke-WebToolDownload -tool $captured
-                    } catch {
-                        $err = $_
-                        Write-Log "Unexpected error: $err"
-                        Set-Status "Error" "Something went wrong." "ERR"
-                    }
-                }) | Out-Null
+                Write-Log "Starting: $tName"
+                try {
+                    Invoke-WebToolDownload -tool $captured
+                } catch {
+                    $err = $_
+                    Write-Log "Unexpected error: $err"
+                    Set-Status "Error" "Something went wrong." "ERR"
+                }
             }
         })
 
