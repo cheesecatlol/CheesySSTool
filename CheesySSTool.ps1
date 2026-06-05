@@ -161,8 +161,8 @@ $ToolData = @(
                         <TextBlock Text="  -  Cat &amp; Cheese Toolkit" FontSize="11" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="4,0,0,0"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <Button x:Name="MinBtn"   Style="{StaticResource TitleBtn}" Content="-"/>
-                        <Button x:Name="CloseBtn" Style="{StaticResource TitleBtn}" Content="âœ•"/>
+                        <Button x:Name="MinBtn"   Style="{StaticResource TitleBtn}" Content="_"/>
+                        <Button x:Name="CloseBtn" Style="{StaticResource TitleBtn}" Content="X"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -372,17 +372,51 @@ function Start-CmdToolCommand {
     Start-Process -FilePath "cmd.exe" -ArgumentList "/k", "powershell.exe -NoProfile -ExecutionPolicy Bypass -EncodedCommand $encodedCommand" -WindowStyle Normal
 }
 
+function Start-DownloadedTool {
+    param(
+        [Parameter(Mandatory=$true)][string]$Directory,
+        [string]$PreferredFile
+    )
+
+    if ($PreferredFile -and (Test-Path -LiteralPath $PreferredFile) -and ($PreferredFile -notmatch "\.zip$")) {
+        Write-Log "Launching $(Split-Path -Leaf $PreferredFile)"
+        Start-AppOrScript -Path $PreferredFile -WorkingDirectory (Split-Path -Parent $PreferredFile)
+        return $true
+    }
+
+    $launchable = Get-ChildItem -Path $Directory -Recurse -File -ErrorAction SilentlyContinue |
+        Where-Object { $_.Extension -match "^\.(exe|cmd|bat)$" } |
+        Sort-Object @{ Expression = { if ($_.Extension -eq ".exe") { 0 } else { 1 } } }, FullName |
+        Select-Object -First 1
+
+    if ($launchable) {
+        Write-Log "Launching $($launchable.Name)"
+        Start-AppOrScript -Path $launchable.FullName -WorkingDirectory $launchable.DirectoryName
+        return $true
+    }
+
+    Write-Log "No .exe, .cmd, or .bat found - opening folder."
+    Start-Process -FilePath explorer.exe -ArgumentList "`"$Directory`""
+    return $false
+}
+
 function Get-GitHubAssetUrl {
     param([string]$ReleaseUrl)
-    if ($ReleaseUrl -match "github\.com/([^/]+)/([^/]+)/releases/tag/([^/]+)") {
-        $user = $Matches[1]; $repo = $Matches[2]; $tag = $Matches[3]
+
+    if ($ReleaseUrl -match "github\.com/([^/]+)/([^/]+)/releases/tag/(.+)$") {
+        $user = $Matches[1]
+        $repo = $Matches[2]
+        $tag = [Uri]::EscapeDataString(([Uri]::UnescapeDataString($Matches[3])).TrimEnd("/"))
         $api  = "https://api.github.com/repos/$user/$repo/releases/tags/$tag"
         try {
             $rel   = Invoke-RestMethod -Uri $api -Headers @{"User-Agent"="CheesySSTool"} -ErrorAction Stop
-            $asset = $rel.assets | Where-Object { $_.name -match "\.(exe|zip)$" } | Select-Object -First 1
+            $asset = $rel.assets | Where-Object { $_.name -match "\.(exe|zip|cmd|bat)$" } | Select-Object -First 1
             if ($asset) { return @{ url=$asset.browser_download_url; name=$asset.name } }
-        } catch {}
+        } catch {
+            Write-Log "GitHub lookup failed: $($_.Exception.Message)"
+        }
     }
+
     return $null
 }
 
@@ -395,7 +429,7 @@ function Invoke-ToolDownloadAndRun {
 
     $asset = Get-GitHubAssetUrl -ReleaseUrl $tool.URL
     if (-not $asset) {
-        Write-Log "No .exe/.zip asset found for $name - opening browser."
+        Write-Log "No .exe/.zip/.cmd/.bat asset found for $name - opening browser."
         Set-Status "Ready" "No asset found, opened GitHub." "IDLE"
         Start-Process $tool.URL
         return
@@ -425,19 +459,17 @@ function Invoke-ToolDownloadAndRun {
 
     if ($asset.name -match "\.zip$") {
         Write-Log "Extracting $($asset.name)..."
-        Expand-Archive -Path $destFile -DestinationPath $destDir -Force
-        $exe = Get-ChildItem -Path $destDir -Filter "*.exe" -Recurse | Select-Object -First 1
-        if ($exe) {
-            $exeName = $exe.FullName
-            Write-Log "Launching $($exe.Name)"
-            Start-AppOrScript -Path $exeName -WorkingDirectory $destDir
-        } else {
-            Write-Log "No exe found - opening folder."
-            Start-Process explorer.exe $destDir
+        try {
+            Expand-Archive -Path $destFile -DestinationPath $destDir -Force -ErrorAction Stop
+        } catch {
+            Write-Log "Extract failed: $($_.Exception.Message)"
+            Set-Status "Error" "Could not extract $name." "ERR"
+            Start-Process -FilePath explorer.exe -ArgumentList "`"$destDir`""
+            return
         }
+        [void](Start-DownloadedTool -Directory $destDir)
     } else {
-        Write-Log "Launching $($asset.name)"
-        Start-AppOrScript -Path $destFile -WorkingDirectory $destDir
+        [void](Start-DownloadedTool -Directory $destDir -PreferredFile $destFile)
     }
 
     Set-Status "Ready" "$name launched successfully." "IDLE"
@@ -448,7 +480,7 @@ function Invoke-WebToolDownload {
     $name = $tool.Name
     $url  = $tool.URL
 
-    if ($url -match "\.(zip|exe)$") {
+    if ($url -match "\.(zip|exe|cmd|bat)$") {
         $fileName = ($url -split "/")[-1]
         $destDir  = "$installDir\Others\$name"
         if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
@@ -473,13 +505,17 @@ function Invoke-WebToolDownload {
         }
 
         if ($fileName -match "\.zip$") {
-            Expand-Archive -Path $destFile -DestinationPath $destDir -Force
-            $exe = Get-ChildItem -Path $destDir -Filter "*.exe" -Recurse | Select-Object -First 1
-            if ($exe) { Start-AppOrScript -Path $exe.FullName -WorkingDirectory $destDir; Write-Log "Launched $($exe.Name)" }
-            else { Start-Process explorer.exe $destDir; Write-Log "Opened folder (no exe found)." }
+            try {
+                Expand-Archive -Path $destFile -DestinationPath $destDir -Force -ErrorAction Stop
+            } catch {
+                Write-Log "Extract failed: $($_.Exception.Message)"
+                Set-Status "Error" "Could not extract $name." "ERR"
+                Start-Process -FilePath explorer.exe -ArgumentList "`"$destDir`""
+                return
+            }
+            [void](Start-DownloadedTool -Directory $destDir)
         } else {
-            Start-AppOrScript -Path $destFile -WorkingDirectory $destDir
-            Write-Log "Launched $fileName"
+            [void](Start-DownloadedTool -Directory $destDir -PreferredFile $destFile)
         }
         Set-Status "Ready" "$name launched." "IDLE"
     } else {
