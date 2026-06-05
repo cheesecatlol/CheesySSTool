@@ -158,11 +158,11 @@ $ToolData = @(
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="=^.^=" FontSize="14" FontWeight="Bold" Foreground="{StaticResource Accent}" FontFamily="Consolas"/>
                         <TextBlock Text="  CheesySSTool" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                        <TextBlock Text="  —  Cat &amp; Cheese Toolkit" FontSize="11" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                        <TextBlock Text="  -  Cat &amp; Cheese Toolkit" FontSize="11" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="4,0,0,0"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <Button x:Name="MinBtn"   Style="{StaticResource TitleBtn}" Content="—"/>
-                        <Button x:Name="CloseBtn" Style="{StaticResource TitleBtn}" Content="✕"/>
+                        <Button x:Name="MinBtn"   Style="{StaticResource TitleBtn}" Content="-"/>
+                        <Button x:Name="CloseBtn" Style="{StaticResource TitleBtn}" Content="âœ•"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -347,6 +347,31 @@ function Set-Status {
     })
 }
 
+function Start-AppOrScript {
+    param(
+        [Parameter(Mandatory=$true)][string]$Path,
+        [string]$WorkingDirectory
+    )
+
+    if (-not $WorkingDirectory) { $WorkingDirectory = Split-Path -Parent $Path }
+    $extension = [System.IO.Path]::GetExtension($Path).ToLowerInvariant()
+
+    $quotedPath = '"' + $Path + '"'
+
+    switch ($extension) {
+        ".cmd" { Start-Process -FilePath "cmd.exe" -ArgumentList "/k", $quotedPath -WorkingDirectory $WorkingDirectory -WindowStyle Normal }
+        ".bat" { Start-Process -FilePath "cmd.exe" -ArgumentList "/k", $quotedPath -WorkingDirectory $WorkingDirectory -WindowStyle Normal }
+        default { Start-Process -FilePath $Path -WorkingDirectory $WorkingDirectory -WindowStyle Normal }
+    }
+}
+
+function Start-CmdToolCommand {
+    param([Parameter(Mandatory=$true)][string]$Command)
+
+    $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($Command))
+    Start-Process -FilePath "cmd.exe" -ArgumentList "/k", "powershell.exe -NoProfile -ExecutionPolicy Bypass -EncodedCommand $encodedCommand" -WindowStyle Normal
+}
+
 function Get-GitHubAssetUrl {
     param([string]$ReleaseUrl)
     if ($ReleaseUrl -match "github\.com/([^/]+)/([^/]+)/releases/tag/([^/]+)") {
@@ -370,7 +395,7 @@ function Invoke-ToolDownloadAndRun {
 
     $asset = Get-GitHubAssetUrl -ReleaseUrl $tool.URL
     if (-not $asset) {
-        Write-Log "No .exe/.zip asset found for $name — opening browser."
+        Write-Log "No .exe/.zip asset found for $name - opening browser."
         Set-Status "Ready" "No asset found, opened GitHub." "IDLE"
         Start-Process $tool.URL
         return
@@ -381,7 +406,7 @@ function Invoke-ToolDownloadAndRun {
     $destFile = "$destDir\$($asset.name)"
 
     if (Test-Path $destFile) {
-        Write-Log "Cached: $($asset.name) — skipping download."
+        Write-Log "Cached: $($asset.name) - skipping download."
     } else {
         Write-Log "Downloading $($asset.name)..."
         try {
@@ -405,14 +430,14 @@ function Invoke-ToolDownloadAndRun {
         if ($exe) {
             $exeName = $exe.FullName
             Write-Log "Launching $($exe.Name)"
-            Start-Process $exeName
+            Start-AppOrScript -Path $exeName -WorkingDirectory $destDir
         } else {
-            Write-Log "No exe found — opening folder."
+            Write-Log "No exe found - opening folder."
             Start-Process explorer.exe $destDir
         }
     } else {
         Write-Log "Launching $($asset.name)"
-        Start-Process $destFile
+        Start-AppOrScript -Path $destFile -WorkingDirectory $destDir
     }
 
     Set-Status "Ready" "$name launched successfully." "IDLE"
@@ -430,7 +455,7 @@ function Invoke-WebToolDownload {
         $destFile = "$destDir\$fileName"
 
         if (Test-Path $destFile) {
-            Write-Log "Cached: $fileName — skipping download."
+            Write-Log "Cached: $fileName - skipping download."
         } else {
             Write-Log "Downloading $fileName..."
             try {
@@ -450,10 +475,10 @@ function Invoke-WebToolDownload {
         if ($fileName -match "\.zip$") {
             Expand-Archive -Path $destFile -DestinationPath $destDir -Force
             $exe = Get-ChildItem -Path $destDir -Filter "*.exe" -Recurse | Select-Object -First 1
-            if ($exe) { Start-Process $exe.FullName; Write-Log "Launched $($exe.Name)" }
+            if ($exe) { Start-AppOrScript -Path $exe.FullName -WorkingDirectory $destDir; Write-Log "Launched $($exe.Name)" }
             else { Start-Process explorer.exe $destDir; Write-Log "Opened folder (no exe found)." }
         } else {
-            Start-Process $destFile
+            Start-AppOrScript -Path $destFile -WorkingDirectory $destDir
             Write-Log "Launched $fileName"
         }
         Set-Status "Ready" "$name launched." "IDLE"
@@ -522,7 +547,7 @@ foreach ($cat in $Categories) {
                 Set-Status "Running" "Launching $tName..." "BUSY"
                 Write-Log "Starting: $tName"
                 try {
-                    Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"$($tData.Command)`"" -WindowStyle Normal
+                    Start-CmdToolCommand -Command $tData.Command
                     Write-Log "Launched: $tName"
                     Set-Status "Ready" "$tName launched." "IDLE"
                 } catch {
@@ -607,12 +632,12 @@ $ClearCacheBtn.Add_Click({
         Write-Log "Cleared $count file(s) from install folder."
         Set-Status "Clean" "Removed $count downloaded file(s)." "IDLE"
     } else {
-        Write-Log "Nothing to clear — install folder does not exist yet."
+        Write-Log "Nothing to clear - install folder does not exist yet."
     }
 })
 
 $OpenCmdBtn.Add_Click({
-    Start-Process "cmd.exe"
+    Start-Process -FilePath "cmd.exe"
     Write-Log "Opened CMD."
 })
 
@@ -624,10 +649,16 @@ Write-Log "|  CheesySSTool  =^.^=  v2.0 (WPF)        |"
 Write-Log "|  Cat and Cheese Toolkit                  |"
 Write-Log "+------------------------------------------+"
 Write-Log "$($ToolData.Count) tools loaded across $($Categories.Count) categories."
-Write-Log "GitHub/Web tools download in background — UI stays responsive."
+Write-Log "GitHub/Web tools download in background - UI stays responsive."
 Write-Log "Files saved to: $installDir"
 Write-Log "Ready. Meow!"
 
 Set-Status "Ready" "Select a tool to launch or download it." "IDLE"
 
 $window.ShowDialog() | Out-Null
+
+
+
+
+
+
