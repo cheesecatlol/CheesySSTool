@@ -1,7 +1,4 @@
-# ==============================================================================
-# CheesySSTool Launcher - Cat & Cheese Edition (WPF)
-# Run: powershell -NoProfile -ExecutionPolicy Bypass -File CheesySSTool.ps1
-# ==============================================================================
+
 
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName PresentationCore
