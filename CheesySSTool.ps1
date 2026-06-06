@@ -1,5 +1,3 @@
-
-
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName PresentationCore
 Add-Type -AssemblyName WindowsBase
@@ -531,6 +529,53 @@ function Invoke-WebToolDownload {
 }
 
 # ==============================================================================
+# LAUNCH ANIMATION
+# ==============================================================================
+function Start-ButtonAnimation {
+    param([System.Windows.Controls.Button]$Button)
+
+    $origBg  = $Button.Background
+    $origFg  = $Button.Foreground
+    $origW   = $Button.Width
+    $origH   = $Button.Height
+
+    # Flash sequence: gold -> white -> gold -> restore, with a scale pulse
+    $flashColors = @("#F5C200", "#FFFFFF", "#F5C200", "#FFE066")
+    $flashFg     = "#0F0B00"
+    $scales      = @(0.93, 0.96, 1.04, 1.0)
+    $delays      = @(0, 80, 160, 250)
+
+    # Disable the button during animation so it can't be double-clicked
+    $Button.IsEnabled = $false
+
+    for ($i = 0; $i -lt $flashColors.Count; $i++) {
+        $color   = $flashColors[$i]
+        $scale   = $scales[$i]
+        $delay   = $delays[$i]
+        $w       = [Math]::Round($origW * $scale)
+        $h       = [Math]::Round($origH * $scale)
+
+        $Button.Dispatcher.Invoke([Action]{
+            $Button.Background = $color
+            $Button.Foreground = $flashFg
+            $Button.Width      = $w
+            $Button.Height     = $h
+        }, [System.Windows.Threading.DispatcherPriority]::Render)
+
+        Start-Sleep -Milliseconds 80
+    }
+
+    # Restore original look
+    $Button.Dispatcher.Invoke([Action]{
+        $Button.Background = $origBg
+        $Button.Foreground = $origFg
+        $Button.Width      = $origW
+        $Button.Height     = $origH
+        $Button.IsEnabled  = $true
+    }, [System.Windows.Threading.DispatcherPriority]::Render)
+}
+
+# ==============================================================================
 # POPULATE TABS
 # ==============================================================================
 $Categories = @("Orbdiff","Spokwn","Tonynoh","Praiselily","RedLotus","Others")
@@ -581,45 +626,93 @@ foreach ($cat in $Categories) {
         ")
 
         $btn.Add_Click({
-            $tName = $_.Source.Content
+            $clickedBtn = $_.Source
+            $tName = $clickedBtn.Content
             $tData = $ToolData | Where-Object { $_.Name -eq $tName } | Select-Object -First 1
 
-            if ($tData.Type -eq "Cmd") {
-                Set-Status "Running" "Launching $tName..." "BUSY"
-                Write-Log "Starting: $tName"
-                try {
-                    Start-CmdToolCommand -Command $tData.Command
-                    Write-Log "Launched: $tName"
-                    Set-Status "Ready" "$tName launched." "IDLE"
-                } catch {
-                    Write-Log "Error: $_"
-                    Set-Status "Error" "Failed to launch $tName." "ERR"
+            # Run flash animation on UI thread, then dispatch tool logic to background
+            $capturedBtn  = $clickedBtn
+            $capturedData = $tData
+
+            $null = [System.Threading.Tasks.Task]::Run([Action]{
+                # Flash animation (runs on a thread pool thread, marshals UI calls via Dispatcher)
+                $origBg = $capturedBtn.Dispatcher.Invoke([Func[object]]{ $capturedBtn.Background })
+                $origFg = $capturedBtn.Dispatcher.Invoke([Func[object]]{ $capturedBtn.Foreground })
+                $origW  = $capturedBtn.Dispatcher.Invoke([Func[object]]{ $capturedBtn.Width })
+                $origH  = $capturedBtn.Dispatcher.Invoke([Func[object]]{ $capturedBtn.Height })
+
+                $capturedBtn.Dispatcher.Invoke([Action]{ $capturedBtn.IsEnabled = $false })
+
+                $steps = @(
+                    @{ bg="#F5C200"; fg="#0F0B00"; ws=0.93 },
+                    @{ bg="#FFFFFF"; fg="#0F0B00"; ws=0.96 },
+                    @{ bg="#F5C200"; fg="#0F0B00"; ws=1.04 },
+                    @{ bg="#FFE066"; fg="#0F0B00"; ws=1.0  }
+                )
+
+                foreach ($step in $steps) {
+                    $s = $step
+                    $w = [Math]::Round($origW * $s.ws)
+                    $h = [Math]::Round($origH * $s.ws)
+                    $capturedBtn.Dispatcher.Invoke([Action]{
+                        $capturedBtn.Background = $s.bg
+                        $capturedBtn.Foreground = $s.fg
+                        $capturedBtn.Width      = $w
+                        $capturedBtn.Height     = $h
+                    }, [System.Windows.Threading.DispatcherPriority]::Render)
+                    Start-Sleep -Milliseconds 75
                 }
-            }
-            elseif ($tData.Type -eq "GitHub") {
-                $captured = $tData
-                Set-Status "Downloading" "Fetching $tName..." "BUSY"
-                Write-Log "Starting download: $tName"
-                try {
-                    Invoke-ToolDownloadAndRun -tool $captured
-                } catch {
-                    $err = $_
-                    Write-Log "Unexpected error: $err"
-                    Set-Status "Error" "Something went wrong." "ERR"
+
+                # Restore button appearance
+                $capturedBtn.Dispatcher.Invoke([Action]{
+                    $capturedBtn.Background = $origBg
+                    $capturedBtn.Foreground = $origFg
+                    $capturedBtn.Width      = $origW
+                    $capturedBtn.Height     = $origH
+                    $capturedBtn.IsEnabled  = $true
+                }, [System.Windows.Threading.DispatcherPriority]::Render)
+
+                # Now run the actual tool logic
+                $tn = $capturedData.Name
+                if ($capturedData.Type -eq "Cmd") {
+                    $capturedBtn.Dispatcher.Invoke([Action]{
+                        $StatusTitle.Text = "Running"
+                        $StatusSub.Text   = "Launching $tn..."
+                        $StatusBadge.Text = "BUSY"
+                    })
+                    Write-Log "Starting: $tn"
+                    try {
+                        Start-CmdToolCommand -Command $capturedData.Command
+                        Write-Log "Launched: $tn"
+                        Set-Status "Ready" "$tn launched." "IDLE"
+                    } catch {
+                        Write-Log "Error: $_"
+                        Set-Status "Error" "Failed to launch $tn." "ERR"
+                    }
                 }
-            }
-            elseif ($tData.Type -eq "Web") {
-                $captured = $tData
-                Set-Status "Downloading" "Fetching $tName..." "BUSY"
-                Write-Log "Starting: $tName"
-                try {
-                    Invoke-WebToolDownload -tool $captured
-                } catch {
-                    $err = $_
-                    Write-Log "Unexpected error: $err"
-                    Set-Status "Error" "Something went wrong." "ERR"
+                elseif ($capturedData.Type -eq "GitHub") {
+                    Set-Status "Downloading" "Fetching $tn..." "BUSY"
+                    Write-Log "Starting download: $tn"
+                    try {
+                        Invoke-ToolDownloadAndRun -tool $capturedData
+                    } catch {
+                        $err = $_
+                        Write-Log "Unexpected error: $err"
+                        Set-Status "Error" "Something went wrong." "ERR"
+                    }
                 }
-            }
+                elseif ($capturedData.Type -eq "Web") {
+                    Set-Status "Downloading" "Fetching $tn..." "BUSY"
+                    Write-Log "Starting: $tn"
+                    try {
+                        Invoke-WebToolDownload -tool $capturedData
+                    } catch {
+                        $err = $_
+                        Write-Log "Unexpected error: $err"
+                        Set-Status "Error" "Something went wrong." "ERR"
+                    }
+                }
+            })
         })
 
         $wrap.Children.Add($btn) | Out-Null
@@ -683,9 +776,3 @@ Write-Log "Files saved to: $installDir"
 Set-Status "Ready" "Select a tool to launch or download it." "IDLE"
 
 $window.ShowDialog() | Out-Null
-
-
-
-
-
-
