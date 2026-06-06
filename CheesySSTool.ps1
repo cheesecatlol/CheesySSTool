@@ -631,28 +631,12 @@ foreach ($cat in $Categories) {
             $tName      = $clickedBtn.Content
             $tData      = $ToolData | Where-Object { $_.Name -eq $tName } | Select-Object -First 1
 
-            # --- Flash animation: inline, forces UI refresh with DoEvents ---
+            # --- Flash: instant gold highlight, restored after tool runs ---
             $origBg = $clickedBtn.Background
             $origFg = $clickedBtn.Foreground
-            $origW  = $clickedBtn.Width
-            $origH  = $clickedBtn.Height
-
-            $frames = @(
-                @("#F5C200","#0F0B00",0.93),
-                @("#FFFFFF","#0F0B00",0.97),
-                @("#F5C200","#0F0B00",1.04),
-                @($origBg,  $origFg,  1.0 )
-            )
-            foreach ($frame in $frames) {
-                $clickedBtn.Background = $frame[0]
-                $clickedBtn.Foreground = $frame[1]
-                $clickedBtn.Width      = [Math]::Round($origW * $frame[2])
-                $clickedBtn.Height     = [Math]::Round($origH * $frame[2])
-                [System.Windows.Forms.Application]::DoEvents()
-                Start-Sleep -Milliseconds 60
-            }
-            $clickedBtn.Width  = $origW
-            $clickedBtn.Height = $origH
+            $clickedBtn.Background = "#F5C200"
+            $clickedBtn.Foreground = "#0F0B00"
+            [System.Windows.Forms.Application]::DoEvents()
 
             # --- Tool logic ---
             if ($tData.Type -eq "Cmd") {
@@ -687,6 +671,8 @@ foreach ($cat in $Categories) {
                     Set-Status "Error" "Something went wrong." "ERR"
                 }
             }
+            $clickedBtn.Background = $origBg
+            $clickedBtn.Foreground = $origFg
         })
 
         $wrap.Children.Add($btn) | Out-Null
