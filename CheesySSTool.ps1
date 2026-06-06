@@ -607,9 +607,9 @@ foreach ($cat in $Categories) {
         $btn.Foreground  = "#F3E5F5"
 
         switch ($t.Type) {
-            "Cmd"    { $btn.Background = "#0F2840" }
-            "GitHub" { $btn.Background = "#191932" }
-            "Web"    { $btn.Background = "#20102D" }
+            "Cmd"    { $btn.Background = "#1A1200" }
+            "GitHub" { $btn.Background = "#1A1200" }
+            "Web"    { $btn.Background = "#1A1200" }
         }
 
         $btn.Template = [Windows.Markup.XamlReader]::Parse("
@@ -700,6 +700,77 @@ $catTimer.Add_Tick({
     $CatBlock.Text = $catFrames[$script:catIdx]
 })
 $catTimer.Start()
+
+
+# ==============================================================================
+# CAT PAW CURSOR
+# ==============================================================================
+Add-Type -AssemblyName System.Drawing
+
+$pawSize = 32
+$bmp = New-Object System.Drawing.Bitmap($pawSize, $pawSize, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
+$g = [System.Drawing.Graphics]::FromImage($bmp)
+$g.Clear([System.Drawing.Color]::Transparent)
+$g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+
+$pad  = [System.Drawing.SolidBrush]::new([System.Drawing.Color]::FromArgb(255, 245, 194, 0))   # gold
+$dark = [System.Drawing.SolidBrush]::new([System.Drawing.Color]::FromArgb(180, 30, 20, 0))     # dark outline
+
+# Main palm pad
+$g.FillEllipse($dark,  6, 13, 20, 16)
+$g.FillEllipse($pad,   7, 14, 18, 14)
+
+# Toe pads (top row: 3 toes)
+foreach ($tx in @(5, 12, 19)) {
+    $g.FillEllipse($dark, $tx - 1, 5, 9, 9)
+    $g.FillEllipse($pad,  $tx,     6, 7, 7)
+}
+# Extra small outer toes
+$g.FillEllipse($dark, 1, 10, 7, 7)
+$g.FillEllipse($pad,  2, 11, 5, 5)
+$g.FillEllipse($dark, 24, 10, 7, 7)
+$g.FillEllipse($pad,  25, 11, 5, 5)
+
+$g.Dispose()
+
+# Convert to cursor via icon handle
+$hBmp   = $bmp.GetHbitmap([System.Drawing.Color]::Transparent)
+$hMask  = [System.Drawing.Bitmap]::new($pawSize, $pawSize)
+$hMaskH = $hMask.GetHbitmap()
+
+Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+public class CursorHelper {
+    [StructLayout(LayoutKind.Sequential)]
+    public struct ICONINFO {
+        public bool fIcon;
+        public int xHotspot;
+        public int yHotspot;
+        public IntPtr hbmMask;
+        public IntPtr hbmColor;
+    }
+    [DllImport("user32.dll")] public static extern IntPtr CreateIconIndirect(ref ICONINFO ii);
+    [DllImport("user32.dll")] public static extern bool DestroyIcon(IntPtr h);
+    [DllImport("gdi32.dll")]  public static extern bool DeleteObject(IntPtr h);
+}
+"@ -ErrorAction SilentlyContinue
+
+$iconInfo = New-Object CursorHelper+ICONINFO
+$iconInfo.fIcon    = $false
+$iconInfo.xHotspot = 8
+$iconInfo.yHotspot = 8
+$iconInfo.hbmMask  = $hMaskH
+$iconInfo.hbmColor = $hBmp
+
+$hCursor = [CursorHelper]::CreateIconIndirect([ref]$iconInfo)
+[CursorHelper]::DeleteObject($hBmp)  | Out-Null
+[CursorHelper]::DeleteObject($hMaskH) | Out-Null
+$bmp.Dispose()
+$hMask.Dispose()
+
+$pawCursor = [System.Windows.Interop.Cursor]::new($hCursor)
+$window.Cursor = $pawCursor
 
 # ==============================================================================
 # EVENTS
