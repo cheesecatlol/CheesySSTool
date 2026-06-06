@@ -733,43 +733,37 @@ $g.FillEllipse($pad,  25, 11, 5, 5)
 
 $g.Dispose()
 
-# Convert to cursor via icon handle
-$hBmp   = $bmp.GetHbitmap([System.Drawing.Color]::Transparent)
-$hMask  = [System.Drawing.Bitmap]::new($pawSize, $pawSize)
-$hMaskH = $hMask.GetHbitmap()
-
-Add-Type -TypeDefinition @"
-using System;
-using System.Runtime.InteropServices;
-public class CursorHelper {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct ICONINFO {
-        public bool fIcon;
-        public int xHotspot;
-        public int yHotspot;
-        public IntPtr hbmMask;
-        public IntPtr hbmColor;
-    }
-    [DllImport("user32.dll")] public static extern IntPtr CreateIconIndirect(ref ICONINFO ii);
-    [DllImport("user32.dll")] public static extern bool DestroyIcon(IntPtr h);
-    [DllImport("gdi32.dll")]  public static extern bool DeleteObject(IntPtr h);
-}
-"@ -ErrorAction SilentlyContinue
-
-$iconInfo = New-Object CursorHelper+ICONINFO
-$iconInfo.fIcon    = $false
-$iconInfo.xHotspot = 8
-$iconInfo.yHotspot = 8
-$iconInfo.hbmMask  = $hMaskH
-$iconInfo.hbmColor = $hBmp
-
-$hCursor = [CursorHelper]::CreateIconIndirect([ref]$iconInfo)
-[CursorHelper]::DeleteObject($hBmp)  | Out-Null
-[CursorHelper]::DeleteObject($hMaskH) | Out-Null
+# Save bitmap as PNG then load as cursor via temp .cur file
+$cursorPath = [System.IO.Path]::Combine($env:TEMP, "cheesy_paw.cur")
+$ms = New-Object System.IO.MemoryStream
+$bmp.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png)
 $bmp.Dispose()
-$hMask.Dispose()
+$pngBytes = $ms.ToArray()
+$ms.Dispose()
 
-$pawCursor = [System.Windows.Interop.Cursor]::new($hCursor)
+# Write a .cur file: ICONDIR header + ICONDIRENTRY + PNG data
+$hotX = 8; $hotY = 8
+$dataOffset = 6 + 16  # ICONDIR(6) + ICONDIRENTRY(16)
+$fileStream = [System.IO.File]::Open($cursorPath, [System.IO.FileMode]::Create)
+$bw = New-Object System.IO.BinaryWriter($fileStream)
+# ICONDIR
+$bw.Write([uint16]0)       # reserved
+$bw.Write([uint16]2)       # type 2 = cursor
+$bw.Write([uint16]1)       # count
+# ICONDIRENTRY
+$bw.Write([byte]$pawSize)  # width
+$bw.Write([byte]$pawSize)  # height
+$bw.Write([byte]0)         # color count
+$bw.Write([byte]0)         # reserved
+$bw.Write([uint16]$hotX)   # hotspot X
+$bw.Write([uint16]$hotY)   # hotspot Y
+$bw.Write([uint32]$pngBytes.Length)
+$bw.Write([uint32]$dataOffset)
+$bw.Write($pngBytes, 0, $pngBytes.Length)
+$bw.Close()
+$fileStream.Close()
+
+$pawCursor = New-Object System.Windows.Input.Cursor($cursorPath)
 $window.Cursor = $pawCursor
 
 # ==============================================================================
