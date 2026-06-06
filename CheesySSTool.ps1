@@ -627,92 +627,88 @@ foreach ($cat in $Categories) {
 
         $btn.Add_Click({
             $clickedBtn = $_.Source
-            $tName = $clickedBtn.Content
-            $tData = $ToolData | Where-Object { $_.Name -eq $tName } | Select-Object -First 1
+            $tName      = $clickedBtn.Content
+            $tData      = $ToolData | Where-Object { $_.Name -eq $tName } | Select-Object -First 1
 
-            # Run flash animation on UI thread, then dispatch tool logic to background
-            $capturedBtn  = $clickedBtn
-            $capturedData = $tData
+            # --- Flash animation via DispatcherTimer (stays on UI thread) ---
+            $origBg = $clickedBtn.Background
+            $origFg = $clickedBtn.Foreground
+            $origW  = $clickedBtn.Width
+            $origH  = $clickedBtn.Height
 
-            $null = [System.Threading.Tasks.Task]::Run([Action]{
-                # Flash animation (runs on a thread pool thread, marshals UI calls via Dispatcher)
-                $origBg = $capturedBtn.Dispatcher.Invoke([Func[object]]{ $capturedBtn.Background })
-                $origFg = $capturedBtn.Dispatcher.Invoke([Func[object]]{ $capturedBtn.Foreground })
-                $origW  = $capturedBtn.Dispatcher.Invoke([Func[object]]{ $capturedBtn.Width })
-                $origH  = $capturedBtn.Dispatcher.Invoke([Func[object]]{ $capturedBtn.Height })
+            $flashSteps = @(
+                @{ bg="#F5C200"; fg="#0F0B00"; ws=0.93 },
+                @{ bg="#FFFFFF"; fg="#0F0B00"; ws=0.97 },
+                @{ bg="#F5C200"; fg="#0F0B00"; ws=1.04 },
+                @{ bg=$origBg;   fg=$origFg;   ws=1.0  }
+            )
+            $script:flashIndex = 0
+            $script:flashBtn   = $clickedBtn
+            $script:flashOrigW = $origW
+            $script:flashOrigH = $origH
 
-                $capturedBtn.Dispatcher.Invoke([Action]{ $capturedBtn.IsEnabled = $false })
+            $flashTimer = New-Object System.Windows.Threading.DispatcherTimer
+            $flashTimer.Interval = [TimeSpan]::FromMilliseconds(70)
 
-                $steps = @(
-                    @{ bg="#F5C200"; fg="#0F0B00"; ws=0.93 },
-                    @{ bg="#FFFFFF"; fg="#0F0B00"; ws=0.96 },
-                    @{ bg="#F5C200"; fg="#0F0B00"; ws=1.04 },
-                    @{ bg="#FFE066"; fg="#0F0B00"; ws=1.0  }
-                )
+            # Capture tool data for use after animation
+            $script:pendingToolData = $tData
 
-                foreach ($step in $steps) {
-                    $s = $step
-                    $w = [Math]::Round($origW * $s.ws)
-                    $h = [Math]::Round($origH * $s.ws)
-                    $capturedBtn.Dispatcher.Invoke([Action]{
-                        $capturedBtn.Background = $s.bg
-                        $capturedBtn.Foreground = $s.fg
-                        $capturedBtn.Width      = $w
-                        $capturedBtn.Height     = $h
-                    }, [System.Windows.Threading.DispatcherPriority]::Render)
-                    Start-Sleep -Milliseconds 75
-                }
+            $flashTimer.Add_Tick({
+                $step = $flashSteps[$script:flashIndex]
+                $w    = [Math]::Round($script:flashOrigW * $step.ws)
+                $h    = [Math]::Round($script:flashOrigH * $step.ws)
+                $script:flashBtn.Background = $step.bg
+                $script:flashBtn.Foreground = $step.fg
+                $script:flashBtn.Width      = $w
+                $script:flashBtn.Height     = $h
 
-                # Restore button appearance
-                $capturedBtn.Dispatcher.Invoke([Action]{
-                    $capturedBtn.Background = $origBg
-                    $capturedBtn.Foreground = $origFg
-                    $capturedBtn.Width      = $origW
-                    $capturedBtn.Height     = $origH
-                    $capturedBtn.IsEnabled  = $true
-                }, [System.Windows.Threading.DispatcherPriority]::Render)
+                $script:flashIndex++
+                if ($script:flashIndex -ge $flashSteps.Count) {
+                    $flashTimer.Stop()
+                    # Restore exact original size
+                    $script:flashBtn.Width  = $script:flashOrigW
+                    $script:flashBtn.Height = $script:flashOrigH
 
-                # Now run the actual tool logic
-                $tn = $capturedData.Name
-                if ($capturedData.Type -eq "Cmd") {
-                    $capturedBtn.Dispatcher.Invoke([Action]{
-                        $StatusTitle.Text = "Running"
-                        $StatusSub.Text   = "Launching $tn..."
-                        $StatusBadge.Text = "BUSY"
-                    })
-                    Write-Log "Starting: $tn"
-                    try {
-                        Start-CmdToolCommand -Command $capturedData.Command
-                        Write-Log "Launched: $tn"
-                        Set-Status "Ready" "$tn launched." "IDLE"
-                    } catch {
-                        Write-Log "Error: $_"
-                        Set-Status "Error" "Failed to launch $tn." "ERR"
+                    # --- Run tool logic after animation finishes ---
+                    $td = $script:pendingToolData
+                    $tn = $td.Name
+
+                    if ($td.Type -eq "Cmd") {
+                        Set-Status "Running" "Launching $tn..." "BUSY"
+                        Write-Log "Starting: $tn"
+                        try {
+                            Start-CmdToolCommand -Command $td.Command
+                            Write-Log "Launched: $tn"
+                            Set-Status "Ready" "$tn launched." "IDLE"
+                        } catch {
+                            Write-Log "Error: $_"
+                            Set-Status "Error" "Failed to launch $tn." "ERR"
+                        }
                     }
-                }
-                elseif ($capturedData.Type -eq "GitHub") {
-                    Set-Status "Downloading" "Fetching $tn..." "BUSY"
-                    Write-Log "Starting download: $tn"
-                    try {
-                        Invoke-ToolDownloadAndRun -tool $capturedData
-                    } catch {
-                        $err = $_
-                        Write-Log "Unexpected error: $err"
-                        Set-Status "Error" "Something went wrong." "ERR"
+                    elseif ($td.Type -eq "GitHub") {
+                        Set-Status "Downloading" "Fetching $tn..." "BUSY"
+                        Write-Log "Starting download: $tn"
+                        try {
+                            Invoke-ToolDownloadAndRun -tool $td
+                        } catch {
+                            Write-Log "Unexpected error: $_"
+                            Set-Status "Error" "Something went wrong." "ERR"
+                        }
                     }
-                }
-                elseif ($capturedData.Type -eq "Web") {
-                    Set-Status "Downloading" "Fetching $tn..." "BUSY"
-                    Write-Log "Starting: $tn"
-                    try {
-                        Invoke-WebToolDownload -tool $capturedData
-                    } catch {
-                        $err = $_
-                        Write-Log "Unexpected error: $err"
-                        Set-Status "Error" "Something went wrong." "ERR"
+                    elseif ($td.Type -eq "Web") {
+                        Set-Status "Downloading" "Fetching $tn..." "BUSY"
+                        Write-Log "Starting: $tn"
+                        try {
+                            Invoke-WebToolDownload -tool $td
+                        } catch {
+                            Write-Log "Unexpected error: $_"
+                            Set-Status "Error" "Something went wrong." "ERR"
+                        }
                     }
                 }
             })
+
+            $flashTimer.Start()
         })
 
         $wrap.Children.Add($btn) | Out-Null
