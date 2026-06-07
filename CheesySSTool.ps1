@@ -53,7 +53,7 @@ $ToolData = @(
     @{ Name="ComputerActivityView";  Category="Others";     Type="Web";    URL="https://www.nirsoft.net/utils/computer_activity_view.html" },
     @{ Name="AmcacheParser";         Category="Others";     Type="Web";    URL="https://download.ericzimmermanstools.com/net9/AmcacheParser.zip" },
     @{ Name="JumpListExplorer";      Category="Others";     Type="Web";    URL="https://download.ericzimmermanstools.com/net9/JumpListExplorer.zip" },
-    @{ Name="SystemInformer";        Category="Others";     Type="Web";    URL="https://www.systeminformer.com/canary" },
+    @{ Name="SystemInformer";        Category="Others";     Type="Link";   URL="https://www.systeminformer.com/canary" },
     @{ Name="DIE-engine";            Category="Others";     Type="Web";    URL="https://github.com/horsicq/DIE-engine/releases" },
     @{ Name="DQRKIS-FUCKER";         Category="Others";     Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/cheesecatlol/DQRKIS-FUCKER/refs/heads/main/DqrkisFucker.ps1')" },
     @{ Name="MacroDetector";         Category="Others";     Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/Nickk196/MacroDetector/refs/heads/main/MacroDetector.ps1')" },
@@ -654,7 +654,13 @@ foreach ($cat in $Categories) {
             $clickedBtn.Foreground = "#0F0B00"
             $clickedBtn.IsEnabled  = $false
 
-            if ($tData.Type -eq "Cmd") {
+            if ($tData.Type -eq "Link") {
+                Start-Process $tData.URL
+                Set-Status "Ready" "Opened $tName in browser." "IDLE"
+                $clickedBtn.Background = $origBg
+                $clickedBtn.Foreground = $origFg
+                $clickedBtn.IsEnabled  = $true
+            } elseif ($tData.Type -eq "Cmd") {
                 # Cmd tools are instant, run on UI thread
                 Set-Status "Running" "Launching $tName..." "BUSY"
                 Write-Log "Starting: $tName"
