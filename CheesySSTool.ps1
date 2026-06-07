@@ -721,25 +721,27 @@ foreach ($cat in $Categories) {
                     try {
                         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+                        # Parse repo and tag from the URL
+                        # URL format: https://github.com/owner/repo/releases/tag/vX.X
+                        $cat     = $tData.Category
+                        $destDir = "$installDir\$cat\$name"
+                        if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
+
                         if ($tData.Type -eq "GitHub") {
-                            # Resolve latest release asset from GitHub API
-                            $repo     = $tData.Repo
-                            $apiUrl   = "https://api.github.com/repos/$repo/releases/latest"
+                            $urlParts = $tData.URL -replace "https://github.com/", "" -split "/"
+                            $owner    = $urlParts[0]
+                            $repo     = $urlParts[1]
+                            $tag      = $urlParts[-1]
+                            $apiUrl   = "https://api.github.com/repos/$owner/$repo/releases/tags/$tag"
                             $headers  = @{ "User-Agent" = "CheesySSTool" }
-                            $release  = Invoke-RestMethod -Uri $apiUrl -Headers $headers
+                            $release  = Invoke-RestMethod -Uri $apiUrl -Headers $headers -ErrorAction Stop
                             $asset    = $release.assets | Where-Object { $_.name -match "\.(zip|exe)$" } | Select-Object -First 1
-                            if (-not $asset) { throw "No downloadable asset found." }
+                            if (-not $asset) { throw "No downloadable asset found in release $tag." }
                             $url      = $asset.browser_download_url
                             $fileName = $asset.name
-                            $cat      = $tData.Category
-                            $destDir  = "$installDir\$cat\$name"
-                            if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
                             $destFile = "$destDir\$fileName"
                         } else {
                             $fileName = ($url -split "/")[-1]
-                            $cat      = $tData.Category
-                            $destDir  = "$installDir\$cat\$name"
-                            if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
                             $destFile = "$destDir\$fileName"
                         }
 
