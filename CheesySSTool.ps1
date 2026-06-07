@@ -626,6 +626,7 @@ foreach ($cat in $Categories) {
             "Cmd"    { $btn.Background = "#1A1200" }
             "GitHub" { $btn.Background = "#1A1200" }
             "Web"    { $btn.Background = "#1A1200" }
+            "Link"   { $btn.Background = "#1A1200" }
         }
 
         $btn.Template = [Windows.Markup.XamlReader]::Parse("
