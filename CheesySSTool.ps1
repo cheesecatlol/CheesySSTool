@@ -8,9 +8,9 @@ Add-Type -AssemblyName System.Windows.Forms
 
 $installDir = "$env:USERPROFILE\Downloads\CheesySSTool"
 
-# ==============================================================================
+
 # TOOL DATA
-# ==============================================================================
+
 $ToolData = @(
     @{ Name="PrefetchView";          Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/PrefetchView/releases/latest" },
     @{ Name="BAMReveal";             Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/BAMReveal/releases/latest" },
@@ -57,7 +57,7 @@ $ToolData = @(
     @{ Name="SystemInformer";        Category="Others";     Type="Link";   URL="https://www.systeminformer.com/canary" },
     @{ Name="DIE-engine";            Category="Others";     Type="Web";    URL="https://github.com/horsicq/DIE-engine/releases" },
     @{ Name="DQRKIS-FUCKER";         Category="Others";     Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/cheesecatlol/DQRKIS-FUCKER/refs/heads/main/DqrkisFucker.ps1')" },
-    @{ Name="MacroDetector";         Category="Others";     Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/Nickk196/MacroDetector/refs/heads/main/MacroDetector.ps1')" },
+    @{ Name="MacroDetector";         Category="Others";     Type="Cmd";    Command="powershell -ExecutionPolicy Bypass -Command "Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/NiccBlahh/MacroDetector/refs/heads/main/MacroDetector.ps1')" },
     @{ Name="bstrings";              Category="Zimmerman"; Type="Web"; URL="https://download.ericzimmermanstools.com/net9/bstrings.zip" },
     @{ Name="JLECmd";                Category="Zimmerman"; Type="Web"; URL="https://download.ericzimmermanstools.com/net9/JLECmd.zip" },
     @{ Name="JumpListExplorer";      Category="Zimmerman"; Type="Web"; URL="https://download.ericzimmermanstools.com/net9/JumpListExplorer.zip" },
@@ -73,9 +73,9 @@ $ToolData = @(
     @{ Name="VSRedist";   Category="Dependencies"; Type="Web"; URL="https://aka.ms/vs/17/release/vc_redist.x64.exe" }
 )
 
-# ==============================================================================
-# XAML UI
-# ==============================================================================
+
+# UI
+
 [xml]$xaml = @"
 <Window
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -309,9 +309,9 @@ $ToolData = @(
 </Window>
 "@
 
-# ==============================================================================
-# LOAD WINDOW
-# ==============================================================================
+
+# LOADs WINDOW
+
 $reader = New-Object System.Xml.XmlNodeReader $xaml
 $window = [Windows.Markup.XamlReader]::Load($reader)
 
@@ -330,9 +330,9 @@ $InstPathBlock = $window.FindName("InstPathBlock")
 
 $InstPathBlock.Text = "Install path:`n$installDir"
 
-# ==============================================================================
+
 # HELPERS
-# ==============================================================================
+
 function Write-Log {
     param([string]$msg)
     $time = Get-Date -Format "HH:mm:ss"
@@ -546,9 +546,9 @@ function Invoke-WebToolDownload {
     }
 }
 
-# ==============================================================================
+
 # LAUNCH ANIMATION
-# ==============================================================================
+
 function Start-ButtonAnimation {
     param([System.Windows.Controls.Button]$Button)
 
@@ -593,9 +593,9 @@ function Start-ButtonAnimation {
     }, [System.Windows.Threading.DispatcherPriority]::Render)
 }
 
-# ==============================================================================
-# POPULATE TABS
-# ==============================================================================
+
+# TABS
+
 $Categories = @("Orbdiff","Spokwn","Tonynoh","Praiselily","RedLotus","Zimmerman","Dependencies","Others")
 
 foreach ($cat in $Categories) {
@@ -802,9 +802,9 @@ foreach ($cat in $Categories) {
     $ToolsTab.Items.Add($tab) | Out-Null
 }
 
-# ==============================================================================
+
 # CAT ANIMATION
-# ==============================================================================
+
 $catFrames = @(
     "   /\_____/\  `n  /  ^   ^  \ `n (  =  w  =  )`n  \  (___) / `n  /  |   |  \ `n (__|   |__)",
     "   /\_____/\  `n  /  -   ^  \ `n (  =  w  =  )`n  \  (___) / `n  /  |   |  \ `n (__|   |__)",
@@ -822,9 +822,9 @@ $catTimer.Start()
 
 
 
-# ==============================================================================
+
 # EVENTS
-# ==============================================================================
+
 $window.Add_MouseLeftButtonDown({ try { $window.DragMove() } catch {} })
 $CloseBtn.Add_Click({ $catTimer.Stop(); $window.Close() })
 $MinBtn.Add_Click({ $window.WindowState = "Minimized" })
