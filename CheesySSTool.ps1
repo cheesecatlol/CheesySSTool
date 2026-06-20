@@ -335,11 +335,11 @@ $ToolData = @(
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0">
                 <TextBlock Text="CheesySSTool" FontSize="20" FontWeight="Bold" Foreground="#F5C200" Margin="0,0,0,12"/>
-                <TextBlock TextWrapping="Wrap" Foreground="#3DD9C7" FontSize="13" Margin="0,0,0,12"
+                <TextBlock TextWrapping="Wrap" Foreground="#FFF4C8" FontSize="13" Margin="0,0,0,12"
                            Text="All programs are downloaded automatically from their official GitHub repositories and saved in a neatly organized folder. None of your information is ever collected or modified."/>
                 <TextBlock TextWrapping="Wrap" Foreground="#FFF4C8" FontSize="13" Margin="0,0,0,16"
                            Text="Each tool is developed and maintained by its own author. I take no responsibility for anything that may be found regarding these tools in the future."/>
-                <TextBlock TextWrapping="Wrap" Foreground="#FF6B6B" FontSize="13" FontWeight="SemiBold"
+                <TextBlock TextWrapping="Wrap" Foreground="#FFF4C8" FontSize="13" FontWeight="SemiBold"
                            Text="To continue, you must agree with everything stated above."/>
             </StackPanel>
             <Grid Grid.Row="1" VerticalAlignment="Bottom">
