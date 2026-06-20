@@ -312,6 +312,83 @@ $ToolData = @(
 
 # LOADs WINDOW
 
+# ==============================================================================
+# DISCLAIMER DIALOG (shown before main window)
+# ==============================================================================
+[xml]$disclaimerXaml = @"
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="CheesySSTool"
+    Width="560" Height="560"
+    WindowStartupLocation="CenterScreen"
+    ResizeMode="NoResize"
+    WindowStyle="None"
+    AllowsTransparency="True"
+    Background="Transparent"
+    FontFamily="Segoe UI">
+    <Border Background="#0F0B00" BorderBrush="#3D2E00" BorderThickness="1" CornerRadius="8" Padding="24">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="56"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0">
+                <TextBlock Text="SSTool" FontSize="20" FontWeight="Bold" Foreground="#F5C200" Margin="0,0,0,12"/>
+                <TextBlock TextWrapping="Wrap" Foreground="#FFF4C8" FontSize="13" Margin="0,0,0,12"
+                           Text="This tool is designed to make it easier to use the utilities commonly needed during a screenshare."/>
+                <TextBlock TextWrapping="Wrap" Foreground="#3DD9C7" FontSize="13" Margin="0,0,0,12"
+                           Text="All programs are downloaded automatically from their official GitHub repositories and saved in a neatly organized folder. None of your information is ever collected or modified."/>
+                <TextBlock TextWrapping="Wrap" Foreground="#FFF4C8" FontSize="13" Margin="0,0,0,12"
+                           Text="Each tool is developed and maintained by its own author. I take no responsibility for anything that may be found regarding these tools in the future."/>
+                <TextBlock TextWrapping="Wrap" Foreground="#F5C200" FontSize="13" Margin="0,0,0,4"
+                           Text="CheesySSTool itself is developed by cheese cat. If you like the project, feel free to follow me on GitHub:"/>
+                <TextBlock Text="github.com/cheesecatlol" Foreground="#F5C200" FontSize="13" Margin="0,0,0,16"/>
+                <TextBlock TextWrapping="Wrap" Foreground="#FF6B6B" FontSize="13" FontWeight="SemiBold"
+                           Text="To continue, you must agree with everything stated above."/>
+            </StackPanel>
+            <Grid Grid.Row="1" VerticalAlignment="Bottom">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="CancelBtn" Grid.Column="0" Content="Cancel" Height="40"
+                        Background="Transparent" Foreground="#FFF4C8" BorderBrush="#3D2E00" BorderThickness="1"
+                        Cursor="Hand" FontSize="13"/>
+                <Button x:Name="AcceptBtn" Grid.Column="2" Content="Accept &amp; Continue" Height="40"
+                        Background="#221800" Foreground="#F5C200" BorderBrush="#F5C200" BorderThickness="1"
+                        Cursor="Hand" FontSize="13" FontWeight="SemiBold"/>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
+"@
+
+$disclaimerReader = New-Object System.Xml.XmlNodeReader $disclaimerXaml
+$disclaimerWindow = [Windows.Markup.XamlReader]::Load($disclaimerReader)
+$disclaimerWindow.Add_MouseLeftButtonDown({ try { $disclaimerWindow.DragMove() } catch {} })
+
+$CancelBtn = $disclaimerWindow.FindName("CancelBtn")
+$AcceptBtn = $disclaimerWindow.FindName("AcceptBtn")
+
+$script:disclaimerAccepted = $false
+
+$AcceptBtn.Add_Click({
+    $script:disclaimerAccepted = $true
+    $disclaimerWindow.Close()
+})
+$CancelBtn.Add_Click({
+    $script:disclaimerAccepted = $false
+    $disclaimerWindow.Close()
+})
+
+$disclaimerWindow.ShowDialog() | Out-Null
+
+if (-not $script:disclaimerAccepted) {
+    exit
+}
+
 $reader = New-Object System.Xml.XmlNodeReader $xaml
 $window = [Windows.Markup.XamlReader]::Load($reader)
 
