@@ -12,75 +12,83 @@ $installDir = "$env:USERPROFILE\Downloads\CheesySSTool"
 # TOOL DATA
 
 $ToolData = @(
-    @{ Name="PrefetchView";          Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/PrefetchView/releases/latest" },
-    @{ Name="BAMReveal";             Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/BAMReveal/releases/latest" },
-    @{ Name="StringsParser";         Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/StringsParser/releases/latest" },
-    @{ Name="Fileless";              Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/Fileless/releases/latest" },
-    @{ Name="DPS-Analyzer";          Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/DPS-Analyzer/releases/latest" },
-    @{ Name="UserAssistView";        Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/UserAssistView/releases/latest" },
-    @{ Name="JournalParser";         Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/JournalParser/releases/latest" },
-    @{ Name="InjGen";                Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/InjGen/releases/latest" },
-    @{ Name="USBDetector";           Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/USBDetector/releases/latest" },
-    @{ Name="PFTrace";               Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/PFTrace/releases/latest" },
-    @{ Name="CheckDeletedUSN";       Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/CheckDeletedUSN/releases/latest" },
-    @{ Name="JARParser";             Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/JARParser/releases/latest" },
-    @{ Name="BAM-parser";            Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/BAM-parser/releases/latest" },
-    @{ Name="PathsParser";           Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/PathsParser/releases/latest" },
-    @{ Name="JournalTrace";          Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/JournalTrace/releases/latest" },
-    @{ Name="KernelLiveDumpTool";    Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/KernelLiveDumpTool/releases/latest" },
-    @{ Name="BamDeletedKeys";        Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/BamDeletedKeys/releases/latest" },
-    @{ Name="Espouken Tool";         Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/Tool/releases/latest" },
-    @{ Name="pcasvc-executed";       Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/pcasvc-executed/releases/latest" },
-    @{ Name="process-parser";        Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/process-parser/releases/latest" },
-    @{ Name="prefetch-parser";       Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/prefetch-parser/releases/latest" },
-    @{ Name="ActivitiesCache";       Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/ActivitiesCache-execution/releases/latest" },
-    @{ Name="MeowDoomsdayFucker";    Category="Tonynoh";    Type="GitHub"; URL="https://github.com/MeowTonynoh/MeowDoomsdayFucker/releases/latest" },
-    @{ Name="MeowModAnalyzer";       Category="Tonynoh";    Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/MeowTonynoh/MeowModAnalyzer/main/MeowModAnalyzer.ps1')" },
-    @{ Name="MeowResolver";          Category="Tonynoh";    Type="GitHub"; URL="https://github.com/MeowTonynoh/MeowResolver/releases/latest" },
-    @{ Name="MeowNovowareFucker";    Category="Tonynoh";    Type="GitHub"; URL="https://github.com/MeowTonynoh/MeowNovowareFucker/releases/latest" },
-    @{ Name="MeowImportsChecker";    Category="Tonynoh";    Type="GitHub"; URL="https://github.com/MeowTonynoh/MeowImportsChecker/releases/latest" },
-    @{ Name="MeowClientsFucker";     Category="Tonynoh";    Type="GitHub"; URL="https://github.com/MeowTonynoh/MeowClientFucker/releases/latest" },
-    @{ Name="PSHunter";              Category="Praiselily"; Type="GitHub"; URL="https://github.com/praiselily/PSHunter/releases/latest" },
-    @{ Name="AltDetector";           Category="Praiselily"; Type="GitHub"; URL="https://github.com/praiselily/AltDetector/releases/latest" },
-    @{ Name="WeHateFakers";          Category="Praiselily"; Type="Cmd";    Command="iwr https://raw.githubusercontent.com/praiselily/WeHateFakers/refs/heads/main/HotspotLogs.ps1 | iex" },
-    @{ Name="CommonDirectories";     Category="Praiselily"; Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/praiselily/lilith-ps/refs/heads/main/CommonDirectories.ps1')" },
-    @{ Name="HarddiskConverter";     Category="Praiselily"; Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/praiselily/lilith-ps/refs/heads/main/HarddiskConverter.ps1')" },
-    @{ Name="Services";              Category="Praiselily"; Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/praiselily/lilith-ps/refs/heads/main/Services.ps1')" },
-    @{ Name="SignedScheduledTasks";  Category="Praiselily"; Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/praiselily/lilith-ps/refs/heads/main/Signed-Scheduled-Tasks.ps1')" },
-    @{ Name="RL ModAnalyzer";        Category="RedLotus";   Type="GitHub"; URL="https://github.com/ItzIceHere/RedLotus-Mod-Analyzer/releases/latest" },
-    @{ Name="RL TaskSentinel";       Category="RedLotus";   Type="GitHub"; URL="https://github.com/ItzIceHere/RedLotus-Task-Sentinel/releases/latest" },
-    @{ Name="RL AltChecker";         Category="RedLotus";   Type="GitHub"; URL="https://github.com/ItzIceHere/RedLotusAltChecker/releases/latest" },
-    @{ Name="ComputerActivityView";  Category="Others";     Type="Web";    URL="https://www.nirsoft.net/utils/computer_activity_view.html" },
-    @{ Name="AmcacheParser";         Category="Others";     Type="Web";    URL="https://download.ericzimmermanstools.com/net9/AmcacheParser.zip" },
-    @{ Name="SystemInformer";        Category="Others";     Type="Link";   URL="https://www.systeminformer.com/canary" },
-    @{ Name="DIE-engine";            Category="Others";     Type="Web";    URL="https://github.com/horsicq/DIE-engine/releases" },
-    @{ Name="DQRKIS-FUCKER";         Category="Others";     Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/cheesecatlol/DQRKIS-FUCKER/refs/heads/main/DqrkisFucker.ps1')" },
-    @{ Name="MacroDetector";         Category="Others";     Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/NiccBlahh/MacroDetector/refs/heads/main/MacroDetector.ps1')" },
-    @{ Name="bstrings";              Category="Zimmerman"; Type="Web"; URL="https://download.ericzimmermanstools.com/net9/bstrings.zip" },
-    @{ Name="JLECmd";                Category="Zimmerman"; Type="Web"; URL="https://download.ericzimmermanstools.com/net9/JLECmd.zip" },
-    @{ Name="JumpListExplorer";      Category="Zimmerman"; Type="Web"; URL="https://download.ericzimmermanstools.com/net9/JumpListExplorer.zip" },
-    @{ Name="MFTECmd";               Category="Zimmerman"; Type="Web"; URL="https://download.ericzimmermanstools.com/net9/MFTECmd.zip" },
-    @{ Name="PECmd";                 Category="Zimmerman"; Type="Web"; URL="https://download.ericzimmermanstools.com/net9/PECmd.zip" },
-    @{ Name="RecentFileCacheParser"; Category="Zimmerman"; Type="Web"; URL="https://download.ericzimmermanstools.com/net9/RecentFileCacheParser.zip" },
-    @{ Name="RegistryExplorer";      Category="Zimmerman"; Type="Web"; URL="https://download.ericzimmermanstools.com/net9/RegistryExplorer.zip" },
-    @{ Name="ShellBagsExplorer";     Category="Zimmerman"; Type="Web"; URL="https://download.ericzimmermanstools.com/net9/ShellBagsExplorer.zip" },
-    @{ Name="SrumECmd";              Category="Zimmerman"; Type="Web"; URL="https://download.ericzimmermanstools.com/net9/SrumECmd.zip" },
-    @{ Name="TimelineExplorer";      Category="Zimmerman"; Type="Web"; URL="https://download.ericzimmermanstools.com/net9/TimelineExplorer.zip" },
-    @{ Name="FullEventLogView";      Category="NirSoft";   Type="Web"; URL="https://www.nirsoft.net/utils/fulleventlogview.zip" },
-    @{ Name="NetworkUsageView";      Category="NirSoft";   Type="Web"; URL="https://www.nirsoft.net/utils/networkusageview.zip" },
-    @{ Name="BrowserDownloadsView";  Category="NirSoft";   Type="Web"; URL="https://www.nirsoft.net/utils/browserdownloadsview.zip" },
-    @{ Name="AlternateStreamView";   Category="NirSoft";   Type="Web"; URL="https://www.nirsoft.net/utils/alternatestreamview.zip" },
-    @{ Name="USBDeview";             Category="NirSoft";   Type="Web"; URL="https://www.nirsoft.net/utils/usbdeview.zip" },
-    @{ Name="OpenSaveFilesView";     Category="NirSoft";   Type="Web"; URL="https://www.nirsoft.net/utils/opensavefilesview.zip" },
-    @{ Name="ExecutedProgramsList";  Category="NirSoft";   Type="Web"; URL="https://www.nirsoft.net/utils/executedprogramslist.zip" },
-    @{ Name="TaskSchedulerView";     Category="NirSoft";   Type="Web"; URL="https://www.nirsoft.net/utils/taskschedulerview.zip" },
-    @{ Name="JumpListsView";         Category="NirSoft";   Type="Web"; URL="https://www.nirsoft.net/utils/jumplistsview.zip" },
-    @{ Name="WinPrefetchView";       Category="NirSoft";   Type="Web"; URL="https://www.nirsoft.net/utils/winprefetchview.zip" },
-    @{ Name="RegScanner";            Category="NirSoft";   Type="Web"; URL="https://www.nirsoft.net/utils/regscanner.zip" },
-    @{ Name="ShellBagsView";         Category="NirSoft";   Type="Web"; URL="https://www.nirsoft.net/utils/shellbagsview.zip" },
-    @{ Name="NET 9.0";    Category="Dependencies"; Type="Web"; URL="https://download.visualstudio.microsoft.com/download/pr/92dba916-bc51-4e76-8b0e-d41d37ce5fa4/ab08f3e95bf7a3d3da336a7e8c8eca63/dotnet-sdk-9.0.203-win-x64.exe" },
-    @{ Name="NET 10.0";   Category="Dependencies"; Type="Web"; URL="https://download.visualstudio.microsoft.com/download/pr/b3f93f0e-9e5e-4b4c-a4c4-36db0c4b0e3e/dotnet-runtime-10.0.0-win-x64.exe" },
-    @{ Name="VSRedist";   Category="Dependencies"; Type="Web"; URL="https://aka.ms/vs/17/release/vc_redist.x64.exe" }
+    @{ Name="PrefetchView";          Desc="Parses prefetch, extracts file info";          Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/PrefetchView/releases/latest" },
+    @{ Name="BAMReveal";             Desc="Parses BAM forensic artefact";                 Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/BAMReveal/releases/latest" },
+    @{ Name="StringsParser";         Desc="Strings + YARA + signatures scanner";          Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/StringsParser/releases/latest" },
+    @{ Name="Fileless";              Desc="Detects fileless via eventlog + memdump";      Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/Fileless/releases/latest" },
+    @{ Name="DPS-Analyzer";          Desc="Analyzes DPS memory";                          Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/DPS-Analyzer/releases/latest" },
+    @{ Name="UserAssistView";        Desc="Parses UserAssist registry artifact";          Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/UserAssistView/releases/latest" },
+    @{ Name="JournalParser";         Desc="Parses NTFS USNJournal entries";               Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/JournalParser/releases/latest" },
+    @{ Name="InjGen";                Desc="Detects JNI/JVMTI memory injections";         Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/InjGen/releases/latest" },
+    @{ Name="USBDetector";           Desc="Detects USB device history";                   Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/USBDetector/releases/latest" },
+    @{ Name="PFTrace";               Desc="Rundll32/Regsvr32 prefetch analysis";          Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/PFTrace/releases/latest" },
+    @{ Name="CheckDeletedUSN";       Desc="Compares USN timestamp vs boot time";          Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/CheckDeletedUSN/releases/latest" },
+    @{ Name="JARParser";             Desc="Parses JAR prefetch, DcomLaunch strings";      Category="Orbdiff";    Type="GitHub"; URL="https://github.com/Orbdiff/JARParser/releases/latest" },
+    @{ Name="BAM-parser";            Desc="Parses BAM entries for execution history";     Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/BAM-parser/releases/latest" },
+    @{ Name="PathsParser";           Desc="Extracts and analyzes executable paths";       Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/PathsParser/releases/latest" },
+    @{ Name="JournalTrace";          Desc="Traces file activity via USN journal";         Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/JournalTrace/releases/latest" },
+    @{ Name="KernelLiveDumpTool";    Desc="Captures live kernel memory dump";             Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/KernelLiveDumpTool/releases/latest" },
+    @{ Name="BamDeletedKeys";        Desc="Finds deleted BAM registry keys";              Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/BamDeletedKeys/releases/latest" },
+    @{ Name="Espouken Tool";         Desc="All-in-one SS forensics toolkit";              Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/Tool/releases/latest" },
+    @{ Name="pcasvc-executed";       Desc="Extracts PCA service execution records";       Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/pcasvc-executed/releases/latest" },
+    @{ Name="process-parser";        Desc="Parses process execution artefacts";           Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/process-parser/releases/latest" },
+    @{ Name="prefetch-parser";       Desc="Parses Windows prefetch files";                Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/prefetch-parser/releases/latest" },
+    @{ Name="ActivitiesCache";       Desc="Parses ActivitiesCache execution history";     Category="Spokwn";     Type="GitHub"; URL="https://github.com/spokwn/ActivitiesCache-execution/releases/latest" },
+    @{ Name="MeowDoomsdayFucker";    Desc="Detects Doomsday cheat artefacts";             Category="Tonynoh";    Type="GitHub"; URL="https://github.com/MeowTonynoh/MeowDoomsdayFucker/releases/latest" },
+    @{ Name="MeowModAnalyzer";       Desc="Analyzes mod files for suspicious content";    Category="Tonynoh";    Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/MeowTonynoh/MeowModAnalyzer/main/MeowModAnalyzer.ps1')" },
+    @{ Name="MeowResolver";          Desc="Resolves obfuscated strings in binaries";      Category="Tonynoh";    Type="GitHub"; URL="https://github.com/MeowTonynoh/MeowResolver/releases/latest" },
+    @{ Name="MeowNovowareFucker";    Desc="Detects Novoware cheat artefacts";             Category="Tonynoh";    Type="GitHub"; URL="https://github.com/MeowTonynoh/MeowNovowareFucker/releases/latest" },
+    @{ Name="MeowImportsChecker";    Desc="Checks PE imports for suspicious DLLs";        Category="Tonynoh";    Type="GitHub"; URL="https://github.com/MeowTonynoh/MeowImportsChecker/releases/latest" },
+    @{ Name="MeowClientsFucker";     Desc="Detects known cheat client artefacts";         Category="Tonynoh";    Type="GitHub"; URL="https://github.com/MeowTonynoh/MeowClientFucker/releases/latest" },
+    @{ Name="PSHunter";              Desc="Hunts suspicious PowerShell activity";         Category="Praiselily"; Type="GitHub"; URL="https://github.com/praiselily/PSHunter/releases/latest" },
+    @{ Name="AltDetector";           Desc="Detects alternate account artefacts";          Category="Praiselily"; Type="GitHub"; URL="https://github.com/praiselily/AltDetector/releases/latest" },
+    @{ Name="WeHateFakers";          Desc="Checks hotspot / tethering logs";              Category="Praiselily"; Type="Cmd";    Command="iwr https://raw.githubusercontent.com/praiselily/WeHateFakers/refs/heads/main/HotspotLogs.ps1 | iex" },
+    @{ Name="CommonDirectories";     Desc="Lists files in common suspicious dirs";        Category="Praiselily"; Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/praiselily/lilith-ps/refs/heads/main/CommonDirectories.ps1')" },
+    @{ Name="HarddiskConverter";     Desc="Converts harddisk identifiers for review";     Category="Praiselily"; Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/praiselily/lilith-ps/refs/heads/main/HarddiskConverter.ps1')" },
+    @{ Name="Services";              Desc="Lists and analyzes running services";          Category="Praiselily"; Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/praiselily/lilith-ps/refs/heads/main/Services.ps1')" },
+    @{ Name="SignedScheduledTasks";  Desc="Finds unsigned / suspicious scheduled tasks"; Category="Praiselily"; Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/praiselily/lilith-ps/refs/heads/main/Signed-Scheduled-Tasks.ps1')" },
+    @{ Name="RL ModAnalyzer";        Desc="Analyzes mod files for cheat indicators";     Category="RedLotus";   Type="GitHub"; URL="https://github.com/ItzIceHere/RedLotus-Mod-Analyzer/releases/latest" },
+    @{ Name="RL TaskSentinel";       Desc="Monitors scheduled tasks for anomalies";      Category="RedLotus";   Type="GitHub"; URL="https://github.com/ItzIceHere/RedLotus-Task-Sentinel/releases/latest" },
+    @{ Name="RL AltChecker";         Desc="Checks for alternate account indicators";     Category="RedLotus";   Type="GitHub"; URL="https://github.com/ItzIceHere/RedLotusAltChecker/releases/latest" },
+    @{ Name="ComputerActivityView";  Desc="Timeline of computer activity events";        Category="Others";     Type="Web";    URL="https://www.nirsoft.net/utils/computer_activity_view.html" },
+    @{ Name="AmcacheParser";         Desc="Parses AMCache with YARA + signatures";       Category="Others";     Type="Web";    URL="https://download.ericzimmermanstools.com/net9/AmcacheParser.zip" },
+    @{ Name="SystemInformer";        Desc="Advanced process and kernel inspector";        Category="Others";     Type="Link";   URL="https://www.systeminformer.com/canary" },
+    @{ Name="DIE-engine";            Desc="Detects file type, packer, compiler";         Category="Others";     Type="Web";    URL="https://github.com/horsicq/DIE-engine/releases" },
+    @{ Name="DQRKIS-FUCKER";         Desc="Detects DQRKIS cheat artefacts";              Category="Others";     Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/cheesecatlol/DQRKIS-FUCKER/refs/heads/main/DqrkisFucker.ps1')" },
+    @{ Name="MacroDetector";         Desc="Detects macro / clicker software traces";     Category="Others";     Type="Cmd";    Command="Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/NiccBlahh/MacroDetector/refs/heads/main/MacroDetector.ps1')" },
+    @{ Name="Jarabel";               Desc="Locates .jar files with detailed checks";     Category="Others";     Type="GitHub"; URL="https://github.com/nay-cat/Jarabel/releases/latest" },
+    @{ Name="Luyten";                Desc="Open source Java decompiler GUI (Procyon)";   Category="Others";     Type="GitHub"; URL="https://github.com/deathmarine/Luyten/releases/latest" },
+    @{ Name="VMAware";               Desc="Advanced VM detection library and tool";      Category="Others";     Type="GitHub"; URL="https://github.com/kernelwernel/VMAware/releases/latest" },
+    @{ Name="Velociraptor";          Desc="Endpoint DFIR and threat hunting agent";      Category="Others";     Type="GitHub"; URL="https://github.com/Velocidex/velociraptor/releases/latest" },
+    @{ Name="NTFS Parser";           Desc="NTFS forensics: MFT, Bitlocker, USN";        Category="Others";     Type="GitHub"; URL="https://github.com/thewhiteninja/ntfstool/releases/latest" },
+    @{ Name="Hayabusa";              Desc="Fast forensics timeline generator";           Category="Others";     Type="GitHub"; URL="https://github.com/Yamato-Security/hayabusa/releases/latest" },
+    @{ Name="Everything";            Desc="Instant filename search engine for Windows";  Category="Others";     Type="Link";   URL="https://www.voidtools.com/downloads/" },
+    @{ Name="HxD";                   Desc="Fast hex editor with disk and RAM editing";   Category="Others";     Type="Link";   URL="https://mh-nexus.de/en/hxd/" },
+    @{ Name="bstrings";              Desc="Searches strings with regex + YARA";          Category="Zimmerman";  Type="Web";    URL="https://download.ericzimmermanstools.com/net9/bstrings.zip" },
+    @{ Name="JLECmd";                Desc="Parses Jump List files (CLI)";                Category="Zimmerman";  Type="Web";    URL="https://download.ericzimmermanstools.com/net9/JLECmd.zip" },
+    @{ Name="JumpListExplorer";      Desc="GUI explorer for Jump List artefacts";        Category="Zimmerman";  Type="Web";    URL="https://download.ericzimmermanstools.com/net9/JumpListExplorer.zip" },
+    @{ Name="MFTECmd";               Desc="Parses MFT, UsnJrnl, LogFile, Boot";         Category="Zimmerman";  Type="Web";    URL="https://download.ericzimmermanstools.com/net9/MFTECmd.zip" },
+    @{ Name="PECmd";                 Desc="Parses Windows prefetch files (CLI)";         Category="Zimmerman";  Type="Web";    URL="https://download.ericzimmermanstools.com/net9/PECmd.zip" },
+    @{ Name="RecentFileCacheParser"; Desc="Parses RecentFileCache.bcf artefact";         Category="Zimmerman";  Type="Web";    URL="https://download.ericzimmermanstools.com/net9/RecentFileCacheParser.zip" },
+    @{ Name="RegistryExplorer";      Desc="GUI explorer for registry hives";             Category="Zimmerman";  Type="Web";    URL="https://download.ericzimmermanstools.com/net9/RegistryExplorer.zip" },
+    @{ Name="ShellBagsExplorer";     Desc="GUI explorer for ShellBags artefacts";        Category="Zimmerman";  Type="Web";    URL="https://download.ericzimmermanstools.com/net9/ShellBagsExplorer.zip" },
+    @{ Name="SrumECmd";              Desc="Parses SRUM database for usage data";         Category="Zimmerman";  Type="Web";    URL="https://download.ericzimmermanstools.com/net9/SrumECmd.zip" },
+    @{ Name="TimelineExplorer";      Desc="GUI viewer for CSV timeline output";          Category="Zimmerman";  Type="Web";    URL="https://download.ericzimmermanstools.com/net9/TimelineExplorer.zip" },
+    @{ Name="FullEventLogView";      Desc="Views all Windows event log entries";         Category="NirSoft";    Type="Web";    URL="https://www.nirsoft.net/utils/fulleventlogview.zip" },
+    @{ Name="NetworkUsageView";      Desc="Shows network usage per process";             Category="NirSoft";    Type="Web";    URL="https://www.nirsoft.net/utils/networkusageview.zip" },
+    @{ Name="BrowserDownloadsView";  Desc="Lists all browser download history";          Category="NirSoft";    Type="Web";    URL="https://www.nirsoft.net/utils/browserdownloadsview.zip" },
+    @{ Name="AlternateStreamView";   Desc="Reveals hidden NTFS alternate streams";       Category="NirSoft";    Type="Web";    URL="https://www.nirsoft.net/utils/alternatestreamview.zip" },
+    @{ Name="USBDeview";             Desc="Lists all USB devices ever connected";        Category="NirSoft";    Type="Web";    URL="https://www.nirsoft.net/utils/usbdeview.zip" },
+    @{ Name="OpenSaveFilesView";     Desc="Shows files opened/saved via dialogs";        Category="NirSoft";    Type="Web";    URL="https://www.nirsoft.net/utils/opensavefilesview.zip" },
+    @{ Name="ExecutedProgramsList";  Desc="Lists programs run from various sources";     Category="NirSoft";    Type="Web";    URL="https://www.nirsoft.net/utils/executedprogramslist.zip" },
+    @{ Name="TaskSchedulerView";     Desc="Views all scheduled tasks and history";       Category="NirSoft";    Type="Web";    URL="https://www.nirsoft.net/utils/taskschedulerview.zip" },
+    @{ Name="JumpListsView";         Desc="Views Jump List recent/frequent files";       Category="NirSoft";    Type="Web";    URL="https://www.nirsoft.net/utils/jumplistsview.zip" },
+    @{ Name="WinPrefetchView";       Desc="Views Windows prefetch file details";         Category="NirSoft";    Type="Web";    URL="https://www.nirsoft.net/utils/winprefetchview.zip" },
+    @{ Name="RegScanner";            Desc="Scans registry for values / patterns";        Category="NirSoft";    Type="Web";    URL="https://www.nirsoft.net/utils/regscanner.zip" },
+    @{ Name="ShellBagsView";         Desc="Views ShellBags folder access history";       Category="NirSoft";    Type="Web";    URL="https://www.nirsoft.net/utils/shellbagsview.zip" },
+    @{ Name="NET 9.0";               Desc="Microsoft .NET 9 SDK runtime";                Category="Dependencies"; Type="Web"; URL="https://download.visualstudio.microsoft.com/download/pr/92dba916-bc51-4e76-8b0e-d41d37ce5fa4/ab08f3e95bf7a3d3da336a7e8c8eca63/dotnet-sdk-9.0.203-win-x64.exe" },
+    @{ Name="NET 10.0";              Desc="Microsoft .NET 10 runtime";                   Category="Dependencies"; Type="Web"; URL="https://download.visualstudio.microsoft.com/download/pr/b3f93f0e-9e5e-4b4c-a4c4-36db0c4b0e3e/dotnet-runtime-10.0.0-win-x64.exe" },
+    @{ Name="VSRedist";              Desc="Visual C++ redistributable (x64)";            Category="Dependencies"; Type="Web"; URL="https://aka.ms/vs/17/release/vc_redist.x64.exe" }
 )
 
 
@@ -219,9 +227,6 @@ $ToolData = @(
                         <TextBlock Text="Made by cheese cat" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="4,2,0,4"/>
                         <TextBlock Text="Discord: cheese_cat0" FontSize="10" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap" Margin="4,1,0,0"/>
                         <TextBlock Text="GitHub: cheesecatlol" FontSize="10" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap" Margin="4,1,0,0"/>
-
-                        <TextBlock Text="nic" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="4,8,0,4"/>
-                        <TextBlock Text="Discord: mecz.exe" FontSize="10" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap" Margin="4,1,0,0"/>
 
                         <Separator Background="#3D2E00" Margin="0,10,0,10"/>
                         <TextBlock x:Name="InstPathBlock" Text="" FontSize="9" Foreground="#5A4010" TextWrapping="Wrap" Margin="4,0"/>
@@ -697,13 +702,30 @@ foreach ($cat in $Categories) {
         $t = $tool
 
         $btn             = New-Object System.Windows.Controls.Button
-        $btn.Content     = $t.Name
-        $btn.Width       = 200
-        $btn.Height      = 60
+        $btn.Width       = 210
+        $btn.Height      = 80
         $btn.FontSize    = 12
         $btn.Margin      = "6"
         $btn.Cursor      = "Hand"
         $btn.Foreground  = "#F3E5F5"
+
+        # Build name + description StackPanel as button content
+        $btnStack = New-Object System.Windows.Controls.StackPanel
+        $btnStack.Margin = "10,8"
+        $nameBlock = New-Object System.Windows.Controls.TextBlock
+        $nameBlock.Text = $t.Name
+        $nameBlock.FontSize = 12
+        $nameBlock.FontWeight = "SemiBold"
+        $nameBlock.TextWrapping = "Wrap"
+        $descBlock = New-Object System.Windows.Controls.TextBlock
+        $descBlock.Text = $t.Desc
+        $descBlock.FontSize = 10
+        $descBlock.Opacity = 0.6
+        $descBlock.TextWrapping = "Wrap"
+        $descBlock.Margin = "0,3,0,0"
+        $btnStack.Children.Add($nameBlock) | Out-Null
+        $btnStack.Children.Add($descBlock) | Out-Null
+        $btn.Content = $btnStack
 
         switch ($t.Type) {
             "Cmd"    { $btn.Background = "#1A1200" }
@@ -712,57 +734,198 @@ foreach ($cat in $Categories) {
             "Link"   { $btn.Background = "#1A1200" }
         }
 
-        $btn.Template = [Windows.Markup.XamlReader]::Parse("
-            <ControlTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' TargetType='Button'>
-                <Border Background='{TemplateBinding Background}' CornerRadius='6' BorderBrush='#33F5C200' BorderThickness='1'>
-                    <ContentPresenter HorizontalAlignment='Center' VerticalAlignment='Center'/>
-                </Border>
-                <ControlTemplate.Triggers>
-                    <Trigger Property='IsMouseOver' Value='True'>
-                        <Setter Property='Background' Value='#F5C200'/>
-                        <Setter Property='Foreground' Value='#0F0B00'/>
-                    </Trigger>
-                </ControlTemplate.Triggers>
-            </ControlTemplate>
-        ")
+        # Create animatable (unfrozen) objects in PowerShell code
+        $btnBg    = [Windows.Media.SolidColorBrush]::new([Windows.Media.Color]::FromRgb(0x1A, 0x12, 0x00))
+        $btnScale = [Windows.Media.ScaleTransform]::new(1.0, 1.0)
+        $btnGlow  = [Windows.Media.Effects.DropShadowEffect]::new()
+        $btnGlow.Color       = [Windows.Media.Color]::FromRgb(0xF5, 0xC2, 0x00)
+        $btnGlow.BlurRadius  = 0
+        $btnGlow.ShadowDepth = 0
+        $btnGlow.Opacity     = 0
+
+        # Minimal template - binds to the PS-created objects via tag
+        $btn.Template = [Windows.Markup.XamlReader]::Parse(
+            "<ControlTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' TargetType='Button'>" +
+            "  <Border CornerRadius='6' BorderThickness='1' RenderTransformOrigin='0.5,0.5'" +
+            "          Background='{TemplateBinding Background}'" +
+            "          RenderTransform='{TemplateBinding Tag}'" +
+            "          BorderBrush='#33F5C200'>" +
+            "    <ContentPresenter HorizontalAlignment='Center' VerticalAlignment='Center'/>" +
+            "  </Border>" +
+            "</ControlTemplate>"
+        )
+        $btn.Background = $btnBg
+        $btn.Tag        = $btnScale
+
+        # Apply glow after the button is loaded (effect must be set on the Border, not Button)
+        $btn.Add_Loaded({
+            $b = $_.Source
+            if ([Windows.Media.VisualTreeHelper]::GetChildrenCount($b) -gt 0) {
+                $border = [Windows.Media.VisualTreeHelper]::GetChild($b, 0)
+                if ($border) { $border.Effect = $b.Resources["glow"] }
+            }
+        })
+        $btn.Resources["glow"] = $btnGlow
+
+        # Animation helper - all objects are local PS variables, never frozen
+        $btnBgRef    = $btnBg
+        $btnScaleRef = $btnScale
+        $btnGlowRef  = $btnGlow
+
+        $btn.Add_MouseEnter({
+            $b   = $_.Source
+            $bg  = $b.Background
+            $sc  = $b.Tag
+            $glw = $b.Resources["glow"]
+            if (-not $bg -or -not $sc) { return }
+            $d    = [Windows.Duration]::new([TimeSpan]::FromMilliseconds(130))
+            $ease = [Windows.Media.Animation.CubicEase]::new()
+            $a  = [Windows.Media.Animation.ColorAnimation]::new([Windows.Media.Color]::FromRgb(0xF5,0xC2,0x00), $d)
+            $bg.BeginAnimation([Windows.Media.SolidColorBrush]::ColorProperty, $a)
+            $ax = [Windows.Media.Animation.DoubleAnimation]::new(1.06, $d); $ax.EasingFunction = $ease
+            $sc.BeginAnimation([Windows.Media.ScaleTransform]::ScaleXProperty, $ax)
+            $ay = [Windows.Media.Animation.DoubleAnimation]::new(1.06, $d); $ay.EasingFunction = $ease
+            $sc.BeginAnimation([Windows.Media.ScaleTransform]::ScaleYProperty, $ay)
+            if ($glw) {
+                $ab = [Windows.Media.Animation.DoubleAnimation]::new(20.0, $d)
+                $glw.BeginAnimation([Windows.Media.Effects.DropShadowEffect]::BlurRadiusProperty, $ab)
+                $ao = [Windows.Media.Animation.DoubleAnimation]::new(0.9, $d)
+                $glw.BeginAnimation([Windows.Media.Effects.DropShadowEffect]::OpacityProperty, $ao)
+            }
+            $b.Foreground = [Windows.Media.Brushes]::Black
+        })
+
+        $btn.Add_MouseLeave({
+            $b   = $_.Source
+            $bg  = $b.Background
+            $sc  = $b.Tag
+            $glw = $b.Resources["glow"]
+            if (-not $bg -or -not $sc) { return }
+            $d    = [Windows.Duration]::new([TimeSpan]::FromMilliseconds(180))
+            $ease = [Windows.Media.Animation.CubicEase]::new()
+            $a  = [Windows.Media.Animation.ColorAnimation]::new([Windows.Media.Color]::FromRgb(0x1A,0x12,0x00), $d)
+            $bg.BeginAnimation([Windows.Media.SolidColorBrush]::ColorProperty, $a)
+            $ax = [Windows.Media.Animation.DoubleAnimation]::new(1.0, $d); $ax.EasingFunction = $ease
+            $sc.BeginAnimation([Windows.Media.ScaleTransform]::ScaleXProperty, $ax)
+            $ay = [Windows.Media.Animation.DoubleAnimation]::new(1.0, $d); $ay.EasingFunction = $ease
+            $sc.BeginAnimation([Windows.Media.ScaleTransform]::ScaleYProperty, $ay)
+            if ($glw) {
+                $ab = [Windows.Media.Animation.DoubleAnimation]::new(0.0, $d)
+                $glw.BeginAnimation([Windows.Media.Effects.DropShadowEffect]::BlurRadiusProperty, $ab)
+                $ao = [Windows.Media.Animation.DoubleAnimation]::new(0.0, $d)
+                $glw.BeginAnimation([Windows.Media.Effects.DropShadowEffect]::OpacityProperty, $ao)
+            }
+            $b.Foreground = [Windows.Media.BrushConverter]::new().ConvertFrom("#F3E5F5")
+        })
+
+        $btn.Add_PreviewMouseDown({
+            $b  = $_.Source
+            $sc = $b.Tag
+            if (-not $sc) { return }
+            $d  = [Windows.Duration]::new([TimeSpan]::FromMilliseconds(80))
+            $ax = [Windows.Media.Animation.DoubleAnimation]::new(0.95, $d)
+            $sc.BeginAnimation([Windows.Media.ScaleTransform]::ScaleXProperty, $ax)
+            $ay = [Windows.Media.Animation.DoubleAnimation]::new(0.95, $d)
+            $sc.BeginAnimation([Windows.Media.ScaleTransform]::ScaleYProperty, $ay)
+        })
+
+        $btn.Add_PreviewMouseUp({
+            $b  = $_.Source
+            $sc = $b.Tag
+            if (-not $sc) { return }
+            $d  = [Windows.Duration]::new([TimeSpan]::FromMilliseconds(100))
+            $ax = [Windows.Media.Animation.DoubleAnimation]::new(1.06, $d)
+            $sc.BeginAnimation([Windows.Media.ScaleTransform]::ScaleXProperty, $ax)
+            $ay = [Windows.Media.Animation.DoubleAnimation]::new(1.06, $d)
+            $sc.BeginAnimation([Windows.Media.ScaleTransform]::ScaleYProperty, $ay)
+        })
 
         $btn.Add_Click({
             $clickedBtn = $_.Source
-            $tName      = $clickedBtn.Content
+            $tName      = ($clickedBtn.Content.Children[0]).Text
             $tData      = $ToolData | Where-Object { $_.Name -eq $tName } | Select-Object -First 1
 
-            # Flash button gold instantly
-            $origBg = $clickedBtn.Background
-            $origFg = $clickedBtn.Foreground
-            $clickedBtn.Background = "#F5C200"
-            $clickedBtn.Foreground = "#0F0B00"
-            $clickedBtn.IsEnabled  = $false
+            $clickedBtn.IsEnabled = $false
 
-            if ($tData.Type -eq "Link") {
-                Start-Process $tData.URL
-                Set-Status "Ready" "Opened $tName in browser." "IDLE"
-                $clickedBtn.Background = $origBg
-                $clickedBtn.Foreground = $origFg
-                $clickedBtn.IsEnabled  = $true
-            } elseif ($tData.Type -eq "Cmd") {
-                # Cmd tools are instant, run on UI thread
-                Set-Status "Running" "Launching $tName..." "BUSY"
-                Write-Log "Starting: $tName"
-                try {
-                    Start-CmdToolCommand -Command $tData.Command
-                    Write-Log "Launched: $tName"
-                    Set-Status "Ready" "$tName launched." "IDLE"
-                } catch {
-                    Write-Log "Error: $_"
-                    Set-Status "Error" "Failed to launch $tName." "ERR"
+            # Smooth press-down animation, then run action after UI has painted
+            $sc = $clickedBtn.Tag
+            if ($sc) {
+                $dPress = [Windows.Duration]::new([TimeSpan]::FromMilliseconds(80))
+                $axP = [Windows.Media.Animation.DoubleAnimation]::new(0.93, $dPress)
+                $sc.BeginAnimation([Windows.Media.ScaleTransform]::ScaleXProperty, $axP)
+                $ayP = [Windows.Media.Animation.DoubleAnimation]::new(0.93, $dPress)
+                $sc.BeginAnimation([Windows.Media.ScaleTransform]::ScaleYProperty, $ayP)
+            }
+
+            # Defer actual work so the press animation renders first
+            $script:timer = [Windows.Threading.DispatcherTimer]::new()
+            $script:timer.Interval = [TimeSpan]::FromMilliseconds(100)
+            $script:timerBtn  = $clickedBtn
+            $script:timerName = $tName
+            $script:timerData = $tData
+            $script:timer.Add_Tick({
+                $script:timer.Stop()
+
+                # Animate back to resting state
+                $sc2 = $script:timerBtn.Tag
+                if ($sc2) {
+                    $dRel = [Windows.Duration]::new([TimeSpan]::FromMilliseconds(150))
+                    $ease = [Windows.Media.Animation.CubicEase]::new()
+                    $axR = [Windows.Media.Animation.DoubleAnimation]::new(1.0, $dRel); $axR.EasingFunction = $ease
+                    $sc2.BeginAnimation([Windows.Media.ScaleTransform]::ScaleXProperty, $axR)
+                    $ayR = [Windows.Media.Animation.DoubleAnimation]::new(1.0, $dRel); $ayR.EasingFunction = $ease
+                    $sc2.BeginAnimation([Windows.Media.ScaleTransform]::ScaleYProperty, $ayR)
+                    $bg2 = $script:timerBtn.Background
+                    if ($bg2) {
+                        $aC = [Windows.Media.Animation.ColorAnimation]::new([Windows.Media.Color]::FromRgb(0x1A,0x12,0x00), $dRel)
+                        $bg2.BeginAnimation([Windows.Media.SolidColorBrush]::ColorProperty, $aC)
+                    }
                 }
-                $clickedBtn.Background = $origBg
-                $clickedBtn.Foreground = $origFg
-                $clickedBtn.IsEnabled  = $true
-            } else {
+                $script:timerBtn.Foreground = [Windows.Media.BrushConverter]::new().ConvertFrom("#F3E5F5")
+
+                if ($script:timerData.Type -eq "Link") {
+                    Start-Process $script:timerData.URL
+                    Set-Status "Ready" "Opened $script:timerName in browser." "IDLE"
+                    $script:timerBtn.IsEnabled = $true
+                } elseif ($script:timerData.Type -eq "Cmd") {
+                    Set-Status "Running" "Launching $script:timerName..." "BUSY"
+                    Write-Log "Starting: $script:timerName"
+                    # Run Cmd in background too so UI never blocks
+                    $rsc = [runspacefactory]::CreateRunspace()
+                    $rsc.ApartmentState = "STA"; $rsc.ThreadOptions = "ReuseThread"; $rsc.Open()
+                    $rsc.SessionStateProxy.SetVariable("timerData",    $script:timerData)
+                    $rsc.SessionStateProxy.SetVariable("timerName",    $script:timerName)
+                    $rsc.SessionStateProxy.SetVariable("timerBtn",     $script:timerBtn)
+                    $rsc.SessionStateProxy.SetVariable("dispatcher",   $script:timerBtn.Dispatcher)
+                    $rsc.SessionStateProxy.SetVariable("StatusTitle",  $StatusTitle)
+                    $rsc.SessionStateProxy.SetVariable("StatusSub",    $StatusSub)
+                    $rsc.SessionStateProxy.SetVariable("StatusBadge",  $StatusBadge)
+                    $rsc.SessionStateProxy.SetVariable("LogBox",       $LogBox)
+                    $psc = [powershell]::Create(); $psc.Runspace = $rsc
+                    $null = $psc.AddScript({
+                        function Set-StatusBg { param($t,$s,$b)
+                            $dispatcher.Invoke([Action]{ $StatusTitle.Text=$t; $StatusSub.Text=$s; $StatusBadge.Text=$b })
+                        }
+                        function Write-LogBg { param($m)
+                            $dispatcher.Invoke([Action]{ $LogBox.AppendText("[$(Get-Date -f 'HH:mm:ss')] $m`n"); $LogBox.ScrollToEnd() })
+                        }
+                        try {
+                            $cmd = $timerData.Command
+                            if ($cmd -match '^http') { Start-Process $cmd }
+                            else { Start-Process "cmd.exe" -ArgumentList "/c $cmd" }
+                            Write-LogBg "Launched: $timerName"
+                            Set-StatusBg "Ready" "$timerName launched." "IDLE"
+                        } catch {
+                            Write-LogBg "Error: $_"
+                            Set-StatusBg "Error" "Failed to launch $timerName." "ERR"
+                        }
+                        $dispatcher.Invoke([Action]{ $timerBtn.IsEnabled = $true })
+                    })
+                    $null = $psc.BeginInvoke()
+                } else {
                 # Downloads run in background runspace so UI stays responsive
-                Set-Status "Downloading" "Fetching $tName..." "BUSY"
-                Write-Log "Starting download: $tName"
+                Set-Status "Downloading" "Fetching $script:timerName..." "BUSY"
+                Write-Log "Starting download: $script:timerName"
 
                 $rs = [runspacefactory]::CreateRunspace()
                 $rs.ApartmentState = "STA"
@@ -770,12 +933,10 @@ foreach ($cat in $Categories) {
                 $rs.Open()
 
                 # Pass everything needed into the runspace
-                $rs.SessionStateProxy.SetVariable("tData",      $tData)
+                $rs.SessionStateProxy.SetVariable("tData",      $script:timerData)
                 $rs.SessionStateProxy.SetVariable("installDir", $installDir)
-                $rs.SessionStateProxy.SetVariable("dispatcher", $clickedBtn.Dispatcher)
-                $rs.SessionStateProxy.SetVariable("btn",        $clickedBtn)
-                $rs.SessionStateProxy.SetVariable("origBg",     $origBg)
-                $rs.SessionStateProxy.SetVariable("origFg",     $origFg)
+                $rs.SessionStateProxy.SetVariable("dispatcher", $script:timerBtn.Dispatcher)
+                $rs.SessionStateProxy.SetVariable("btn",        $script:timerBtn)
                 $rs.SessionStateProxy.SetVariable("StatusTitle", $StatusTitle)
                 $rs.SessionStateProxy.SetVariable("StatusSub",   $StatusSub)
                 $rs.SessionStateProxy.SetVariable("StatusBadge", $StatusBadge)
@@ -802,8 +963,6 @@ foreach ($cat in $Categories) {
                     }
                     function Restore-Button {
                         $dispatcher.Invoke([Action]{
-                            $btn.Background = $origBg
-                            $btn.Foreground = $origFg
                             $btn.IsEnabled  = $true
                         })
                     }
@@ -873,7 +1032,9 @@ foreach ($cat in $Categories) {
                 })
 
                 $null = $ps.BeginInvoke()
-            }
+                }
+            })
+            $timer.Start()
         })
 
         $wrap.Children.Add($btn) | Out-Null
